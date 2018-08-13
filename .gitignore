@@ -1,0 +1,7 @@
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+
+debug/
+
+examples/\.ipynb_checkpoints/
