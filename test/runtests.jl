@@ -3,7 +3,7 @@ using JuMP, Ipopt
 using StatsBase, Distributions
 using MLKernels, MLLabelUtils
 using Test
-using LinearAlgebra, Random
+using LinearAlgebra, Random, Statistics
 
 TEST_SOLVER =  with_optimizer(Ipopt.Optimizer, print_level=0)
 
@@ -19,4 +19,6 @@ include("test_utils.jl")
     include("classifiers/classifier_svdd_vanilla_test.jl")
 
     include("init_strategies/init_strategies_test.jl")
+
+    include("solvers/smo_svdd_test.jl")
 end

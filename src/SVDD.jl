@@ -14,8 +14,11 @@ include("init_strategies/strategies_C.jl")
 include("init_strategies/strategies_gamma.jl")
 include("init_strategies/strategies_combined.jl")
 
+include("solvers/solver_base.jl")
+include("solvers/smo_svdd.jl")
+
 using Memento
-using LinearAlgebra, Random
+using LinearAlgebra, Random, Statistics
 
 const LOGGER = getlogger(@__MODULE__)
 
@@ -28,6 +31,8 @@ export
     VanillaSVDD,
     SVDDneg,
     SSAD,
+
+    SMOSolver,
 
     ModelSolverException, ModelStateException,
 
