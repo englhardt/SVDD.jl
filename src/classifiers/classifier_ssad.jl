@@ -125,9 +125,9 @@ function fit!(model::SSAD, solver)
 end
 
 # see also tilitools https://github.com/nicococo/tilitools/blob/master/tilitools/ssad_convex.py
-function solve!(model::SSAD, solver)
+function solve!(model::SSAD, solver::JuMP.OptimizerFactory)
     debug(LOGGER, "[SOLVE] Setting up QP for SSAD with $(is_K_adjusted(model) ? "adjusted" : "non-adjusted") kernel matrix.")
-    QP = Model(solver=solver)
+    QP = Model(solver)
     K = is_K_adjusted(model) ? model.K_adjusted : model.K
     # optimization variables
     @variable(QP, α[1:size(K,1)] >= 0)
@@ -137,7 +137,7 @@ function solve!(model::SSAD, solver)
     cy = get_cy(model)
 
     # objective function
-    @objective(QP, :Max, -0.5*sum(α[i]*α[j] * K[i,j] * cy[i] * cy[j] for i in eachindex(α) for j in eachindex(α)))
+    @objective(QP, Max, -0.5*sum(α[i]*α[j] * K[i,j] * cy[i] * cy[j] for i in eachindex(α) for j in eachindex(α)))
 
     # constraints
     haskey(model.pools, :U) && @constraint(QP, α[model.pools[:U]] .<= model.C1)
@@ -148,9 +148,10 @@ function solve!(model::SSAD, solver)
     @constraint(QP, sum(α[i] * cy[i] for i in eachindex(α)) == 1)
 
     debug(LOGGER, "[SOLVE] Solving QP with $(typeof(solver))...")
-    status = JuMP.solve(QP)
+    JuMP.optimize!(QP)
+    status = JuMP.termination_status(QP)
     debug(LOGGER, "[SOLVE] Finished with status: $(status).")
-    model.alpha_values = JuMP.getvalue(α)
+    model.alpha_values = JuMP.result_value.(α)
     return status
 end
 
