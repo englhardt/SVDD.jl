@@ -63,7 +63,7 @@ function solve!(model::VanillaSVDD, solver)
 end
 
 function get_support_vectors(model::VanillaSVDD)
-    find((model.alpha_values .> OPT_PRECISION) .& (model.alpha_values .< (model.C - OPT_PRECISION)))
+    findall((model.alpha_values .> OPT_PRECISION) .& (model.alpha_values .< (model.C - OPT_PRECISION)))
 end
 
 get_alpha_prime(model::VanillaSVDD) = model.alpha_values

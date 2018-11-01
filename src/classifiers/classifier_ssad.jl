@@ -67,23 +67,23 @@ end
 
 function get_cy(model::SSAD)
     cy = ones(size(model.data, 2))
-    haskey(model.pools, :Lout) && (cy[model.pools[:Lout]] = -1)
+    haskey(model.pools, :Lout) && (cy[model.pools[:Lout]] .= -1)
     return cy
 end
 
 function calculate_rho(model::SSAD)
-    SV_candidates = find(model.alpha_values .> OPT_PRECISION)
-    SV_candidates_U = haskey(model.pools, :U)? SV_candidates ∩ model.pools[:U] : Int64[]
+    SV_candidates = findall(model.alpha_values .> OPT_PRECISION)
+    SV_candidates_U = haskey(model.pools, :U) ? SV_candidates ∩ model.pools[:U] : Int64[]
     cy = get_cy(model)
 
     if length(SV_candidates_U) > 0
         scores = (model.alpha_values .* cy)' * model.K[:, SV_candidates_U]
-        sv = find(model.alpha_values[SV_candidates_U] .< model.C1 - OPT_PRECISION)
+        sv = findall(model.alpha_values[SV_candidates_U] .< model.C1 - OPT_PRECISION)
         ρ = isempty(sv) ? maximum(scores) : minimum(scores[sv])
     else
         scores = model.K'model.alpha_values
         SV_candidates_Lin = haskey(model.pools, :Lin) ? SV_candidates ∩ model.pools[:Lin] : Int64[]
-        SV_candidates_Lout = haskey(model.pools, :Lout)? SV_candidates ∩ model.pools[:Lout] : Int64[]
+        SV_candidates_Lout = haskey(model.pools, :Lout) ? SV_candidates ∩ model.pools[:Lout] : Int64[]
         if length(SV_candidates_Lout) > 0 && length(SV_candidates_Lin) == 0
             warn(LOGGER, "[CALCULATE_RHO] There are no labeled inlier SV -- check OPT_PRECISION.")
             ρ = maximum(scores[SV_candidates_Lout])
@@ -98,13 +98,13 @@ end
 
 function predict(model::SSAD, target::Array{T,2}) where T <: Real
     model.state == model_fitted || throw(ModelStateException(model.state, model_fitted))
-    SV_candidates = find(model.alpha_values .> OPT_PRECISION)
+    SV_candidates = findall(model.alpha_values .> OPT_PRECISION)
     function predict_observation(z)
-        k = vec(mapslices(x -> kernel(model.kernel_fct, z, x), model.data[:, SV_candidates], 1))
+        k = vec(mapslices(x -> kernel(model.kernel_fct, z, x), model.data[:, SV_candidates], dims=1))
         model.alpha_values[SV_candidates]'k
     end
      # this is inverted from Goernitz such that outliers have positive margin to be consistent with SVDD
-    return model.ρ .- vec(mapslices(predict_observation, target, 1))
+    return model.ρ .- vec(mapslices(predict_observation, target, dims=1))
 end
 
 function fit!(model::SSAD, solver)

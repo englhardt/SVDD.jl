@@ -61,7 +61,7 @@
     @testset "predict" begin
         predictions = SVDD.predict(ssad, dummy_data)
         @test length(predictions) == size(dummy_data, 2)
-        @test predictions[1] == SVDD.predict(ssad, [1.0 2.0]')[1]
+        @test predictions[1] == SVDD.predict(ssad, hcat([1.0, 2.0]))[1]
     end
 
     @testset "params" begin
