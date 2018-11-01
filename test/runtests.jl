@@ -1,11 +1,11 @@
 using SVDD
-using Ipopt
+using JuMP, Ipopt
 using StatsBase, Distributions
 using MLKernels, MLLabelUtils
 using Test
 using LinearAlgebra, Random
 
-TEST_SOLVER = IpoptSolver(print_level=0)
+TEST_SOLVER =  with_optimizer(Ipopt.Optimizer, print_level=0)
 
 include("test_utils.jl")
 

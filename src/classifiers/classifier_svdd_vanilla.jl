@@ -46,19 +46,20 @@ function set_C!(model::VanillaSVDD, C::Number)
     return nothing
 end
 
-function solve!(model::VanillaSVDD, solver)
+function solve!(model::VanillaSVDD, solver::JuMP.OptimizerFactory)
     debug(LOGGER, "[SOLVE] Setting up QP for VanillaSVDD with $(is_K_adjusted(model) ? "adjusted" : "non-adjusted") kernel matrix.")
-    QP = Model(solver=solver)
+    QP = Model(solver)
     K = is_K_adjusted(model) ? model.K_adjusted : model.K
 
     @variable(QP, 0 <= α[1:size(K,1)] <= model.C)
-    @objective(QP, :Max, sum(α[i]*K[i,i] for i in eachindex(α)) -
+    @objective(QP, Max, sum(α[i]*K[i,i] for i in eachindex(α)) -
                         sum(α[i]*α[j] * K[i,j] for i in eachindex(α) for j in eachindex(α)))
     @constraint(QP, sum(α) == 1)
     debug(LOGGER, "[SOLVE] Solving QP with $(typeof(solver))...")
-    status = JuMP.solve(QP)
+    JuMP.optimize!(QP)
+    status = JuMP.termination_status(QP)
     debug(LOGGER, "[SOLVE] Finished with status: $(status).")
-    model.alpha_values = JuMP.getvalue(α)
+    model.alpha_values = JuMP.result_value.(α)
     return status
 end
 

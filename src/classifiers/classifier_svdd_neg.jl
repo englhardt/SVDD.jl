@@ -51,18 +51,18 @@ end
 
 set_C!(model::SVDDneg, C::Number) = set_C!(model, (C,C))
 
-function solve!(model::SVDDneg, solver)
+function solve!(model::SVDDneg, solver::JuMP.OptimizerFactory)
     ULin = merge_pools(model.pools, :U, :Lin)
     length(ULin) > 0 || throw(ModelInvariantException("SVDDneg requires samples in pool :Lin or :U."))
 
     debug(LOGGER, "[SOLVE] Setting up QP for SVDDneg with $(is_K_adjusted(model) ? "adjusted" : "non-adjusted") kernel matrix.")
-    QP = Model(solver=solver)
+    QP = Model(solver)
     K = is_K_adjusted(model) ? model.K_adjusted : model.K
 
     @variable(QP, α[1:size(K,1)] >= 0)
 
     if haskey(model.pools, :Lout)
-        @objective(QP, :Max, sum(α[i]*K[i,i] for i in ULin) -
+        @objective(QP, Max, sum(α[i]*K[i,i] for i in ULin) -
                              sum(α[l]*K[l,l] for l in model.pools[:Lout]) -
                              sum(α[i]*α[j] * K[i,j] for i in ULin for j in ULin) +
                              2 * sum(α[l]*α[j] * K[l,j] for l in model.pools[:Lout] for j in ULin) -
@@ -72,15 +72,16 @@ function solve!(model::SVDDneg, solver)
         @constraint(QP, α[ULin] .<= model.C1)
         @constraint(QP, α[model.pools[:Lout]] .<= model.C2)
     else # fall back to standard SVDD
-        @objective(QP, :Max, sum(α[i]*K[i,i] for i in ULin) -
+        @objective(QP, Max, sum(α[i]*K[i,i] for i in ULin) -
                              sum(α[i]*α[j] * K[i,j] for i in ULin for j in ULin))
         @constraint(QP, sum(α) == 1)
         @constraint(QP, α[ULin] .<= model.C1)
     end
     debug(LOGGER, "[SOLVE] Solving QP with $(typeof(solver))...")
-    status = JuMP.solve(QP)
+    JuMP.optimize!(QP)
+    status = JuMP.termination_status(QP)
     debug(LOGGER, "[SOLVE] Finished with status: $(status).")
-    model.alpha_values = JuMP.getvalue(α)
+    model.alpha_values = JuMP.result_value.(α)
     return status
 end
 
