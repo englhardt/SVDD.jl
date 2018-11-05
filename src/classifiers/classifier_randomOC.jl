@@ -1,4 +1,4 @@
-struct RandomOCClassifier <: OCClassifier
+mutable struct RandomOCClassifier <: OCClassifier
     data
     outlier_bias
     RandomOCClassifier(data) = new(data, 0.1)
@@ -28,3 +28,8 @@ invalidate_solution!(model::RandomOCClassifier) = nothing
 
 set_pools!(model::RandomOCClassifier, pools::Vector{Symbol}) = nothing
 set_pools!(model::RandomOCClassifier, pools::Dict{Symbol, Vector{Int}}) = nothing
+
+function set_data!(model::RandomOCClassifier, data::Array{T, 2}) where T <: Real
+    model.data = data
+    return nothing
+end
