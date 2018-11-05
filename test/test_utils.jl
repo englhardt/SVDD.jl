@@ -10,10 +10,10 @@ function generate_mvn_with_outliers(n_dim, n_observations,
 
     if incl_outliers
         x = hcat(inliers, outliers)
-        labels = vcat(fill("inlier", n_observations), fill("outlier", 8))
+        labels = vcat(fill(:inlier, n_observations), fill(:outlier, 8))
     else
         x = inliers
-        labels = vcat(fill("inlier", n_observations))
+        labels = vcat(fill(:inlier, n_observations))
     end
     if normalized
         x = mapslices(normalize, x, dims=2)
