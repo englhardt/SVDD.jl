@@ -17,7 +17,7 @@ function fit!(model::RandomOCClassifier, solver)
 end
 
 function predict(model::RandomOCClassifier, target::Array{T,2}) where T <: Real
-    rand(size(target, 2)) * 2 - model.outlier_bias * 2
+    rand(size(target, 2)) * 2 .- model.outlier_bias * 2
 end
 
 initialize!(model::RandomOCClassifier, strategy::InitializationStrategy) = nothing
