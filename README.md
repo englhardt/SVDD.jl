@@ -10,11 +10,16 @@ The package has been developed as part of a benchmark suite for [active-learning
 > Holger Trittenbach, Adrian Englhardt, Klemens Böhm, "An Overview and a Benchmark of Active Learning for One-Class Classification" [arXiv:1808.04759](https://arxiv.org/abs/1808.04759), 14 Aug 2018
 
 ## Installation
-This package works with Julia 0.6. We plan to upgrade to the latest Julia version once all dependencies support 1.0.
-This package is not registered yet. Please use the following command to clone the package.
+This package works with Julia 1.0.
+This package is not registered yet. Please use the following command to add the package with Pkg3.
 ```Julia
-Pkg.clone("https://github.com/englhardt/SVDD.jl.git")
+using Pkg
+Pkg.add("https://github.com/englhardt/SVDD.jl.git")
 ```
+
+The results presented in the paper base on a previous version of the package and on Julia 0.6.
+To reproduce the experiment results from the paper, use the old package manager (with Pkg.clone) and checkout SVDD.jl at tag `v1.0`.
+
 ## Overview
 
 [One-class classifiers](https://en.wikipedia.org/wiki/One-class_classification) learn to identify if objects belong to a specific class, often used for outlier detection.

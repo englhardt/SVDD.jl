@@ -2,10 +2,10 @@
 function generate_mvn_with_outliers(n_dim, n_observations,
     seed=123, normalized=true, incl_outliers=true)
 
-    srand(seed)
-    norm_distribution = MvNormal(zeros(n_dim), eye(n_dim))
+    Random.seed!(seed)
+    norm_distribution = MvNormal(zeros(n_dim), Matrix(1.0I, n_dim, n_dim))
     inliers = rand(norm_distribution, n_observations)
-    tmp = [rand(MvNormal([x, y], eye(2)), 2) for x in [4,-4] for y in [4,-4]]
+    tmp = [rand(MvNormal([x, y], Matrix(1.0I, 2, 2)), 2) for x in [4,-4] for y in [4,-4]]
     outliers = vcat(hcat(tmp...), zeros(n_dim - 2, 8))
 
     if incl_outliers
@@ -16,7 +16,7 @@ function generate_mvn_with_outliers(n_dim, n_observations,
         labels = vcat(fill("inlier", n_observations))
     end
     if normalized
-        x = mapslices(normalize, x, 2)
+        x = mapslices(normalize, x, dims=2)
     end
     return (x, labels)
 end

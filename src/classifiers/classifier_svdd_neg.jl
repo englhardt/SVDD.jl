@@ -97,10 +97,10 @@ end
 function get_support_vectors(model::SVDDneg)
     ULin = merge_pools(model.pools, :U, :Lin)
     length(ULin) > 0 || throw(ModelInvariantException("SVDDneg requires samples in pool :Lin or :U."))
-    sv = filter!(x -> x in ULin, find((model.alpha_values .> OPT_PRECISION) .& (model.alpha_values .< (model.C1 - OPT_PRECISION))))
+    sv = filter!(x -> x in ULin, findall((model.alpha_values .> OPT_PRECISION) .& (model.alpha_values .< (model.C1 - OPT_PRECISION))))
     if haskey(model.pools, :Lout)
         sv = append!(sv, filter!(x -> x in model.pools[:Lout],
-                                 find((model.alpha_values .> OPT_PRECISION) .& (model.alpha_values .< (model.C2 - OPT_PRECISION)))))
+                                 findall((model.alpha_values .> OPT_PRECISION) .& (model.alpha_values .< (model.C2 - OPT_PRECISION)))))
     end
     return sv
 end

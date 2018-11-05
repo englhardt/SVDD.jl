@@ -15,7 +15,7 @@ include("init_strategies/strategies_gamma.jl")
 include("init_strategies/strategies_combined.jl")
 
 using Memento
-using Compat: @__MODULE__
+using LinearAlgebra, Random
 
 const LOGGER = getlogger(@__MODULE__)
 

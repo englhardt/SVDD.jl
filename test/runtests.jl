@@ -2,7 +2,8 @@ using SVDD
 using Ipopt
 using StatsBase, Distributions
 using MLKernels, MLLabelUtils
-using Base.Test
+using Test
+using LinearAlgebra, Random
 
 TEST_SOLVER = IpoptSolver(print_level=0)
 

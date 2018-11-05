@@ -20,7 +20,7 @@ function predict(model::SVDDClassifier, target::Array{T,2}) where T <: Real
             2 * sum(α[i] * kernel(model.kernel_fct, model.data[:,i], z) for i in eachindex(α)) +
             model.const_term
     end
-    return vec(sqrt.(mapslices(predict_observation, target, 1)) - model.R)
+    return vec(sqrt.(mapslices(predict_observation, target, dims=1)) .- model.R)
 end
 
 function get_R_and_const_term(model::SVDDClassifier)
