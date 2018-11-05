@@ -51,7 +51,7 @@ end
 is_K_adjusted(model)::Bool = model.adjust_K
 
 function update_K!(model)
-    updated_K = MLKernels.kernelmatrix(MLKernels.ColumnMajor(), model.kernel_fct, model.data)
+    updated_K = MLKernels.kernelmatrix(Val(:col), model.kernel_fct, model.data)
     if !isdefined(model, :K) || updated_K != model.K || (!isdefined(model, :K_adjusted) && model.adjust_K)
         debug(LOGGER, "[UPDATE_K] Updating Kernel matrix.")
         invalidate_solution!(model)

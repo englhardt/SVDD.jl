@@ -46,7 +46,7 @@ function calculate_C(model, strategy::BinarySearchCStrategy, kernel)
     debug(LOGGER, "[BINARY_SEARCH] Search parameters: C_min = $(C_min), C_max = $(C_max), max_iter = $(strategy.max_iter).")
 
     m = deepcopy(model)
-    init_strategy = SVDD.FixedParameterInitialization(GaussianKernel(kernel), C_current)
+    init_strategy = SVDD.FixedParameterInitialization(kernel, C_current)
     SVDD.initialize!(m, init_strategy)
 
     while true

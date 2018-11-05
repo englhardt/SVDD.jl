@@ -50,7 +50,7 @@
         SVDD.fit!(svdd_neg, TEST_SOLVER)
         predictions = SVDD.predict(svdd_neg, dummy_data)
         @test sum(predictions .> 0) == 0
-        pools[labels .== "outlier"] = :Lout
+        pools[labels .== "outlier"] .= :Lout
 
         SVDD.set_pools!(svdd_neg, pools)
         @test_throws SVDD.ModelStateException SVDD.predict(svdd_neg, dummy_data)
@@ -71,7 +71,7 @@
         expected = SVDD.predict(svdd_neg, dummy_data)
         @test sum(expected .> 0) > 0
 
-        pools[labels .== "inlier"] = :Lin
+        pools[labels .== "inlier"] .= :Lin
         SVDD.set_pools!(svdd_neg, pools)
 
         SVDD.fit!(svdd_neg, TEST_SOLVER)
