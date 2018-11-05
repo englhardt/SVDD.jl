@@ -13,5 +13,10 @@ notifications:
 addons:
     apt_packages:
         - gfortran
+
+cache:
+    directories:
+        - $HOME/.julia
+
 after_success:
   - julia -e 'import Pkg; cd(Pkg.dir("SVDD")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
