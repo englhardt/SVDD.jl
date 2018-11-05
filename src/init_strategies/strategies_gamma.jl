@@ -1,10 +1,10 @@
 abstract type InitializationStrategyGamma <: InitializationStrategy end
 
 struct FixedGammaStrategy <: InitializationStrategyGamma
-    kernel::Kernel
+    kernel::SquaredExponentialKernel
 end
 
-calculate_gamma(model, strategy::FixedGammaStrategy) = strategy.kernel
+calculate_gamma(model, strategy::FixedGammaStrategy) = MLKernels.getvalue(strategy.kernel.alpha)
 
 """
 Original publication:

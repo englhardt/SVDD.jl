@@ -20,6 +20,6 @@ end
 
 function get_parameters(model, strategy::GammaFirstCombinedStrategy)
     gamma = calculate_gamma(model, strategy.gamma_strategy)
-    C = calculate_C(model, strategy.C_strategy, gamma)
+    C = calculate_C(model, strategy.C_strategy, MLKernels.GaussianKernel(gamma))
     return (C, MLKernels.GaussianKernel(gamma))
 end
