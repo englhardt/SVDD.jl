@@ -85,4 +85,17 @@
         actual_outlier_percentage = countmap(SVDD.classify.(SVDD.predict(model, model.data)))[:outlier] / size(model.data, 2)
         @test abs.(actual_outlier_percentage - target_outlier_percentage) < 0.04
     end
+
+    dummy_data, labels = generate_mvn_with_outliers(2, 50, 42, true, true)
+    pools = fill(:Lin, size(dummy_data, 2))
+
+    @testset "WangGammaStrategy" begin
+        model = SVDD.VanillaSVDD(dummy_data[:, labels .== :inlier])
+        gamma_strategy = SVDD.WangGammaStrategy(TEST_SOLVER, [0.1, 0.5], 1)
+        init_strategy = SVDD.SimpleCombinedStrategy(gamma_strategy, SVDD.FixedCStrategy(1))
+
+        SVDD.initialize!(model, init_strategy)
+        SVDD.fit!(model, TEST_SOLVER)
+        @test all(SVDD.classify.(SVDD.predict(model, dummy_data)) .== labels)
+    end
 end

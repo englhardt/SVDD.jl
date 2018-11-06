@@ -2,6 +2,8 @@ using MLKernels
 using JuMP
 using MLLabelUtils
 using StatsBase
+using NearestNeighbors
+import MLBase
 
 const learning_pool_enc = LabelEnc.NativeLabels([:U, :Lin, :Lout])
 const class_label_enc = LabelEnc.NativeLabels([:inlier, :outlier])
