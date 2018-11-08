@@ -1,7 +1,7 @@
 name = "SVDD"
 uuid = "83536b18-e0df-11e8-1e3f-f991e449cee4"
 authors = ["Holger Trittenbach", "Adrian Englhardt"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
