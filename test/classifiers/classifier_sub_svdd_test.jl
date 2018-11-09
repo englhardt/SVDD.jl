@@ -23,4 +23,11 @@
         @test size(model.K[1]) == (size(dummy_data, 2), size(dummy_data, 2))
         @test all(map(x -> all(diag(x) .≈ 1.0), model.K))
     end
+
+    @testset "fit" begin
+        SVDD.fit!(model, TEST_SOLVER)
+        @test model.state == SVDD.model_fitted
+        @test length(model.alpha_values) == length(subspaces)
+        @test all(length.(model.alpha_values) .== size(model.data, 2))
+    end
 end
