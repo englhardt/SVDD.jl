@@ -3,12 +3,15 @@ module SVDD
 include("svdd_base.jl")
 include("svdd_util.jl")
 
+include("classifiers/classifier_sub_svdd.jl")
+
 include("classifiers/classifier.jl")
 include("classifiers/classifier_svdd.jl")
 include("classifiers/classifier_svdd_vanilla.jl")
 include("classifiers/classifier_svdd_neg.jl")
 include("classifiers/classifier_ssad.jl")
 include("classifiers/classifier_randomOC.jl")
+
 
 include("init_strategies/strategies_C.jl")
 include("init_strategies/strategies_gamma.jl")
@@ -31,6 +34,7 @@ export
     VanillaSVDD,
     SVDDneg,
     SSAD,
+    SubSVDD,
 
     SMOSolver,
 
