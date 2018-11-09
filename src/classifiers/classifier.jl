@@ -50,10 +50,9 @@ end
 
 is_K_adjusted(model)::Bool = model.adjust_K
 calculate_kernel_matrix(model) = MLKernels.kernelmatrix(Val(:col), model.kernel_fct, model.data)
-calculate_kernel_matrix(model::SubSVDD) = map(s -> MLKernels.kernelmatrix(Val(:col), model.kernel_fct, model.data), model.subspaces)
+calculate_kernel_matrix(model::SubSVDD) = map(s -> MLKernels.kernelmatrix(Val(:col), model.kernel_fct, model.data[s,:]), model.subspaces)
 
 function update_K!(model)
-    # updated_K = MLKernels.kernelmatrix(Val(:col), model.kernel_fct, model.data)
     updated_K = calculate_kernel_matrix(model)
     if !isdefined(model, :K) || updated_K != model.K || (!isdefined(model, :K_adjusted) && model.adjust_K)
         debug(LOGGER, "[UPDATE_K] Updating Kernel matrix.")

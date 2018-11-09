@@ -16,6 +16,7 @@
 
     @testset "initialize" begin
         SVDD.initialize!(model, init_strategy)
+        @test !(all(model.K[1] .≈ model.K[2]))
         @test model.state == SVDD.model_initialized
         @test model.data == dummy_data
         @test model.C ≈ C
@@ -29,5 +30,13 @@
         @test model.state == SVDD.model_fitted
         @test length(model.alpha_values) == length(subspaces)
         @test all(length.(model.alpha_values) .== size(model.data, 2))
+        @test all(model.R .> 0.0)
+        @test all(model.const_term .> 0.0)
+    end
+
+    @testset "calculate_c_delta" begin
+        @test SVDD.calculate_upper_limit(model.alpha_values, 1, model.C) ≈ model.C .- model.alpha_values[2]
+        @test SVDD.calculate_upper_limit(model.alpha_values, 2, model.C) ≈ model.C .- model.alpha_values[1]
+        @test SVDD.calculate_upper_limit(model.alpha_values, 2, model.C, fill(0.5, size(model.data, 2))) ≈ 0.5*model.C .- model.alpha_values[1]
     end
 end
