@@ -3,6 +3,11 @@ struct SMOSolver <: SVDDSolver
     max_iterations::Int
 end
 
+"""
+    takeStep!(α, i1, i2, K, C, opt_precision)
+
+    Take optimization step for i1 and i2 and update α.
+"""
 function takeStep!(α, i1, i2, K, C, opt_precision)
     i1 == i2 && return false
 
@@ -36,6 +41,9 @@ end
 
 # TODO: this is a faster version of predict from classifier_svdd for in-sample predictions
 # this should be the default for in-sample predictions
+"""
+    calculate_predictions(α, K, C, opt_precision)
+"""
 function calculate_predictions(α, K, C, opt_precision)
     sv_larger_than_zero = α .> opt_precision
     sv_smaller_than_C = α .< (C - opt_precision)
@@ -54,7 +62,10 @@ function calculate_predictions(α, K, C, opt_precision)
     distances_to_decision_boundary = distances_to_center .- R
     return (distances_to_center, distances_to_decision_boundary, R)
 end
+"""
+    violates_KKT_condition(i2, distances_to_decision_boundary, α, C, opt_precision)
 
+"""
 function violates_KKT_condition(i2, distances_to_decision_boundary, α, C, opt_precision)
     p1 = (α[i2] > opt_precision) && (distances_to_decision_boundary[i2] < -opt_precision) # inlier, but alpha > 0
     p2 = (α[i2] < C - opt_precision) && (distances_to_decision_boundary[i2] > opt_precision) # outlier, but alpha != C
@@ -64,6 +75,9 @@ end
 # See Equation (4.8) in
 # B. Schölkopf, J. C. Platt, J. Shawe-Taylor, A. J. Smola, and R. C. Williamson,
 # "Estimating the support of a high-dimensional distribution," 2001
+"""
+    second_choice_heuristic(i2, α, distances_to_center, C, opt_precision)
+"""
 function second_choice_heuristic(i2, α, distances_to_center, C, opt_precision)
     SV_nb = (α .> opt_precision) .& (α .< C - opt_precision)
     if !any(SV_nb)
@@ -72,8 +86,13 @@ function second_choice_heuristic(i2, α, distances_to_center, C, opt_precision)
     findall(SV_nb)[findmax(abs.(distances_to_center[i2] .- distances_to_center[SV_nb]))[2]]
 end
 
-# The fallback strategies if second choice heuristic returns false follow recommendations in
-# J. Platt, "Sequential minimal optimization: A fast algorithm for training support vector machines," 1998.
+
+"""
+    examineExample!(α, i2, distances_to_center, K, C, opt_precision)
+
+    The fallback strategies if second choice heuristic returns false follow recommendations in
+    J. Platt, "Sequential minimal optimization: A fast algorithm for training support vector machines," 1998.
+"""
 function examineExample!(α, i2, distances_to_center, K, C, opt_precision)
     # use the second choice heuristic
     i1 = second_choice_heuristic(i2, α, distances_to_center, C, opt_precision)
@@ -94,6 +113,9 @@ function examineExample!(α, i2, distances_to_center, K, C, opt_precision)
     return false
 end
 
+"""
+    initialize_alpha(data, C)
+"""
 function initialize_alpha(data, C)
     n_init = trunc(Int, 1 / (C)) + 1
     α = fill(0.0, size(data, 2))
@@ -102,6 +124,10 @@ function initialize_alpha(data, C)
     return α
 end
 
+"""
+    examine_and_update_predictions!(α, distances_to_center, distances_to_decision_boundary, R,
+        KKT_violations, black_list, K, C, opt_precision)
+"""
 function examine_and_update_predictions!(α, distances_to_center, distances_to_decision_boundary, R,
         KKT_violations, black_list, K, C, opt_precision)
     i2 = sample(KKT_violations)
@@ -113,6 +139,10 @@ function examine_and_update_predictions!(α, distances_to_center, distances_to_d
     return distances_to_center, distances_to_decision_boundary, R
 end
 
+"""
+    smo(α, K, C, opt_precision, max_iterations)
+
+"""
 function smo(α, K, C, opt_precision, max_iterations)
     distances_to_center, distances_to_decision_boundary, R = calculate_predictions(α, K, C, opt_precision)
 
@@ -153,15 +183,18 @@ end
 
 function build_result(α, distances_to_decision_boundary, R, K, C, opt_precision, status, msg)
     if status == :Optimal
-        info(LOGGER, "Exit with status: $status. (" * msg * ")")
+        info(LOGGER, "Exit with status: $status. ($msg)")
     else
-        warn(LOGGER, "Exit with status: $status. (" * msg * ")")
+        warn(LOGGER, "Exit with status: $status. ($msg)")
     end
     primal_obj, dual_obj, duality_gap = calculate_duality_gap(α, distances_to_decision_boundary, R, K, C, opt_precision)
     info(LOGGER, "duality gap: $duality_gap, primal objective: $primal_obj, dual objective: $dual_obj")
    return α, primal_obj, duality_gap, duality_gap, status
 end
 
+"""
+    solve!(model::VanillaSVDD, solver::SMOSolver)
+"""
 function solve!(model::VanillaSVDD, solver::SMOSolver)
     α = initialize_alpha(model.data, model.C)
     model.alpha_values, primal_obj, dual_obj, duality_gap, status = smo(α, model.K, model.C, solver.opt_precision, solver.max_iterations)
