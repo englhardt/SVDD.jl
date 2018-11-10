@@ -1,6 +1,7 @@
 # SVDD.jl
 _A Julia package for Support Vector Data Description._
 
+[![][docs-master-img]][docs-master-url]
 [![Build Status](https://travis-ci.com/englhardt/SVDD.jl.svg?branch=master)](https://travis-ci.com/englhardt/SVDD.jl)
 [![Coverage Status](https://coveralls.io/repos/github/englhardt/SVDD.jl/badge.svg?branch=master)](https://coveralls.io/github/englhardt/SVDD.jl?branch=master)
 
@@ -72,3 +73,7 @@ This package is developed and maintained by [Holger Trittenbach](https://github.
 [3] Scott, David W. Multivariate density estimation: theory, practice, and visualization. John Wiley & Sons, 2015.
 
 [4] Silverman, Bernard W. Density estimation for statistics and data analysis. Routledge, 2018.
+
+
+[docs-master-img]: https://img.shields.io/badge/docs-master-blue.svg
+[docs-master-url]: https://englhardt.github.io/SVDD.jl/latest
