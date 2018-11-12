@@ -10,7 +10,7 @@
         @test model.state == SVDD.model_created
         # @test_throws SVDD.ModelStateException SVDD.predict(model, dummy_data)
     end
-    C = 0.1
+    C = 1.0
     gamma = 0.5
     init_strategy = SVDD.FixedParameterInitialization(MLKernels.GaussianKernel(gamma), C)
 
@@ -38,5 +38,12 @@
         @test SVDD.calculate_upper_limit(model.alpha_values, 1, model.C) ≈ model.C .- model.alpha_values[2]
         @test SVDD.calculate_upper_limit(model.alpha_values, 2, model.C) ≈ model.C .- model.alpha_values[1]
         @test SVDD.calculate_upper_limit(model.alpha_values, 2, model.C, fill(0.5, size(model.data, 2))) ≈ 0.5*model.C .- model.alpha_values[1]
+    end
+
+    @testset "predict" begin
+        predictions = SVDD.predict(model, model.data)
+        @test length(predictions) == 2
+        @test all(length.(predictions) .== size(model.data, 2))
+        @test all(map(x -> all(x .< 1e-5), predictions))
     end
 end

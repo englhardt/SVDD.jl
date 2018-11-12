@@ -94,9 +94,13 @@ calculate_upper_limit(α::Vector{Vector{Float64}}, subspace_idx::Int, C) =
 
 function find_support_vectors(model::SubSVDD, subspace_idx)::Vector{Int}
     upper_limits = SVDD.calculate_upper_limit(model.alpha_values, subspace_idx, model.C)
-    sv = findall((model.alpha_values[subspace_idx] .> SVDD.OPT_PRECISION) .& (model.alpha_values[subspace_idx] .< (upper_limits[subspace_idx] .- SVDD.OPT_PRECISION)))
-    return sv
+    return findall((model.alpha_values[subspace_idx] .> SVDD.OPT_PRECISION) .& (model.alpha_values[subspace_idx] .< (upper_limits[subspace_idx] .- SVDD.OPT_PRECISION)))
 end
+
+function find_positive_alpha(model::SubSVDD, subspace_idx)
+    return findall(model.alpha_values[subspace_idx] .> SVDD.OPT_PRECISION)
+end
+
 ```
     Returns the indices of support vectors for each subspace
 ```
@@ -126,4 +130,28 @@ function get_R_and_const_term(model::SubSVDD)
         R[k], const_term[k] = get_R_and_const_term(model, k)
     end
     return (R=R, const_term=const_term)
+end
+
+#TODO in-sample predict
+# function predict(model::SubSVDD, subspace_idx)
+#
+# end
+
+# out of sample predict
+function predict(model::SubSVDD, target::Array{T,2}, subspace_idx) where T <: Real
+    @assert size(model.data, 1) == size(target, 1) "Dimension mismatch between model data and target.
+        You have to provide the full data set, not the subspace projection."
+
+    s = model.subspaces[subspace_idx]
+    pos_sv_idx = find_positive_alpha(model, subspace_idx)
+    function predict_observation(z)
+        kernel(model.kernel_fct, z, z) -
+             2 * sum(model.alpha_values[subspace_idx][i] * kernel(model.kernel_fct, model.data[s, i], z) for i in pos_sv_idx) +
+             model.const_term[subspace_idx]
+    end
+    vec(sqrt.(mapslices(predict_observation, target[s, :], dims=1)) .- model.R[subspace_idx])
+end
+
+function predict(model::SubSVDD, target::Array{T,2}) where T <: Real
+    [predict(model, target, k) for k in eachindex(model.subspaces)]
 end
