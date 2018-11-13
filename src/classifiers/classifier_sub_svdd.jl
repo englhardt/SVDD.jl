@@ -32,6 +32,12 @@ mutable struct SubSVDD <: OCClassifier
     end
 end
 
+macro eachsubspace(expr)
+    args = esc.(expr.args)
+    sub_idx = :(eachindex($(args[2]).subspaces))
+    return :( [$(args[1])($(args[2:end,]...), k) for k in $sub_idx] )
+end
+
 function invalidate_solution!(model::SubSVDD)
     model.alpha_values = Vector{Vector{Float64}}()
     model.const_term = Vector{Vector{Float64}}()
@@ -49,7 +55,9 @@ function fit!(model::SubSVDD, solver)
     debug(LOGGER, "[FIT] Fitting $(typeof(model)).")
     model.state == model_created && throw(ModelStateException(model.state, model_initialized))
     status = solve!(model, solver)
-    model.R, model.const_term = get_R_and_const_term(model)
+    r_and_const_term = @eachsubspace get_R_and_const_term(model)
+    model.R = map(x -> x[:R], r_and_const_term)
+    model.const_term = map(x -> x[:const_term], r_and_const_term)
     model.state = model_fitted
     debug(LOGGER, "[FIT] $(typeof(model)) is now in state $(model.state).")
     return status
@@ -123,19 +131,8 @@ function get_R_and_const_term(model::SubSVDD, subspace_idx)
     return (R=sqrt(R_squared), const_term=const_term)
 end
 
-function get_R_and_const_term(model::SubSVDD)
-    R = Vector{Float64}(undef, length(model.subspaces))
-    const_term = Vector{Float64}(undef, length(model.subspaces))
-    for k in eachindex(model.subspaces)
-        R[k], const_term[k] = get_R_and_const_term(model, k)
-    end
-    return (R=R, const_term=const_term)
-end
-
-#TODO in-sample predict
-# function predict(model::SubSVDD, subspace_idx)
-#
-# end
+#TODO speed-up for in-sample predict by directly using kernel matrix
+predict(model::SubSVDD, subspace_idx) = predict(model, model.data, subspace_idx)
 
 # out of sample predict
 function predict(model::SubSVDD, target::Array{T,2}, subspace_idx) where T <: Real
@@ -150,8 +147,4 @@ function predict(model::SubSVDD, target::Array{T,2}, subspace_idx) where T <: Re
              model.const_term[subspace_idx]
     end
     vec(sqrt.(mapslices(predict_observation, target[s, :], dims=1)) .- model.R[subspace_idx])
-end
-
-function predict(model::SubSVDD, target::Array{T,2}) where T <: Real
-    [predict(model, target, k) for k in eachindex(model.subspaces)]
 end

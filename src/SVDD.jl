@@ -65,5 +65,7 @@ export
     get_kernel,
     get_model_params,
 
-    adjust_kernel_matrix!
+    adjust_kernel_matrix!,
+
+    @eachsubspace
 end
