@@ -18,11 +18,26 @@
     end
 
     @testset "classify" begin
-        scores = [2.0, 0.0, 0.01, -0.1, -5.0]
-        expected = [:outlier, :inlier, :outlier, :inlier, :inlier]
-        actual = SVDD.classify.(scores)
-        @test MLLabelUtils.islabelenc(actual, SVDD.class_label_enc)
-        @test expected == actual
+        @testset "single space" begin
+            scores = [2.0, 0.0, 0.01, -0.1, -5.0]
+            expected = [:outlier, :inlier, :outlier, :inlier, :inlier]
+            actual = SVDD.classify.(scores)
+            @test MLLabelUtils.islabelenc(actual, SVDD.class_label_enc)
+            @test expected == actual
+        end
+
+        @testset "subspaces" begin
+            scores = [[2.0, 0.0, 0.01, -0.1, -5.0],
+                      [2.0, 0.0, 0.0, -0.1, 5.0]]
+            expected_local = [[:outlier, :inlier, :outlier, :inlier, :inlier],
+                              [:outlier, :inlier, :inlier, :inlier, :outlier]]
+            expected_global = [:outlier, :inlier, :outlier, :inlier, :outlier]
+
+            actual_local = SVDD.classify(scores, SVDD.Local)
+            actual_global = SVDD.classify(scores, SVDD.Global)
+            @test expected_local == actual_local
+            @test expected_global == actual_global
+        end
     end
 
     @testset "adjust kernel" begin

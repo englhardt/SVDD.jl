@@ -1,3 +1,5 @@
+Local = Val{:Local}
+Global = Val{:Global}
 
 function merge_pools(pools, names...)
     (names[1] == [] || MLLabelUtils.islabelenc(collect(names), SVDD.learning_pool_enc)) || throw(ArgumentError("$(collect(names)) is not a valid label encoding."))
@@ -5,6 +7,15 @@ function merge_pools(pools, names...)
 end
 
 classify(x::Number) = x > 0 ? :outlier : :inlier
+
+function classify(predictions::Vector{Vector{Float64}}, type::DataType)
+    if type <: Local
+        return map(x -> classify.(x), predictions)
+    else
+        is_global_outlier = mapreduce(x -> x .> 0, (a,b) -> a .| b, predictions)
+        return ifelse.(is_global_outlier, :outlier, :inlier)
+    end
+end
 
 function adjust_kernel_matrix(K::Array{T, 2}; tolerance = 1e-15, warn_threshold = 1e-8) where T <: Real
     info(LOGGER, "Adjusting Kernel Matrix.")
