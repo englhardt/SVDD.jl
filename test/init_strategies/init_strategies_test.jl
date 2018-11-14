@@ -86,6 +86,36 @@
         @test abs.(actual_outlier_percentage - target_outlier_percentage) < 0.04
     end
 
+    @testset "SimpleSubspaceStrategy" begin
+        subspaces = [[1, 2], [3, 4, 5]]
+        model = SVDD.SubSVDD(dummy_data, subspaces, pools)
+        for gamma_strategy in [RuleOfThumbScott(), RuleOfThumbSilverman()]
+            @testset "RuleOfThumb-Global-$(typeof(gamma_strategy))" begin
+                    strategy = SVDD.SimpleSubspaceStrategy(
+                        gamma_strategy,
+                        FixedCStrategy(1.0),
+                        gamma_scope = SVDD.GlobalScope)
+                    C, kernel = SVDD.get_parameters(model, strategy)
+                    @test C ≈ 1.0
+                    @test length(kernel) == 2
+                    @test all(map(x -> x <: MLKernels.GaussianKernel, typeof.(kernel)))
+                    @test kernel[1] == kernel[2]
+                end
+            @testset "RuleOfThumb-Local-$(typeof(gamma_strategy))" begin
+                strategy = SVDD.SimpleSubspaceStrategy(
+                    gamma_strategy,
+                    FixedCStrategy(1.0),
+                    gamma_scope = SVDD.SubspaceScope)
+                C, kernel = SVDD.get_parameters(model, strategy)
+                @test C ≈ 1.0
+                @test length(kernel) == 2
+                @test all(map(x -> x <: MLKernels.GaussianKernel, typeof.(kernel)))
+                @test kernel[1] != kernel[2]
+            end
+        end
+    end
+
+
     dummy_data, labels = generate_mvn_with_outliers(2, 50, 42, true, true)
     pools = fill(:Lin, size(dummy_data, 2))
 

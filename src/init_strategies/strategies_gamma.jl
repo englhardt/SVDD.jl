@@ -5,6 +5,7 @@ struct FixedGammaStrategy <: InitializationStrategyGamma
 end
 
 calculate_gamma(model, strategy::FixedGammaStrategy) = MLKernels.getvalue(strategy.kernel.alpha)
+calculate_gamma(model::SubSVDD, strategy::FixedGammaStrategy, subspace_idx) = calculate_gamma(model, strategy::FixedGammaStrategy)
 
 """
 Original publication:
@@ -12,8 +13,14 @@ Silverman, Bernard W. Density estimation for statistics and data analysis. Routl
 """
 struct RuleOfThumbSilverman <: InitializationStrategyGamma end
 
-function calculate_gamma(model, strategy::RuleOfThumbSilverman)
-    return (size(model.data, 2) * (size(model.data, 1) + 2) / 4.0)^(-1.0 / (size(model.data,1) + 4.0))
+function rule_of_thumb_silverman(data::Array{T,2}) where T <: Real
+    return (size(data, 2) * (size(data, 1) + 2) / 4.0)^(-1.0 / (size(data,1) + 4.0))
+end
+
+calculate_gamma(model, strategy::RuleOfThumbSilverman) = rule_of_thumb_silverman(model.data)
+
+function calculate_gamma(model::SubSVDD, strategy::RuleOfThumbSilverman, subspace_idx)
+    return rule_of_thumb_silverman(model.data[model.subspaces[subspace_idx], :])
 end
 
 """
@@ -22,8 +29,14 @@ Scott, David W. Multivariate density estimation: theory, practice, and visualiza
 """
 struct RuleOfThumbScott <: InitializationStrategyGamma end
 
-function calculate_gamma(model, strategy::RuleOfThumbScott)
-    return size(model.data, 2)^(-1.0/(size(model.data,1) + 4))
+function rule_of_scott(data::Array{T,2}) where T <: Real
+    return size(data, 2)^(-1.0/(size(data, 1) + 4))
+end
+
+calculate_gamma(model, strategy::RuleOfThumbScott) = rule_of_scott(model.data)
+
+function calculate_gamma(model::SubSVDD, strategy::RuleOfThumbScott, subspace_idx)
+    return rule_of_scott(model.data[model.subspaces[subspace_idx], :])
 end
 
 """
