@@ -6,6 +6,7 @@ mutable struct SubSVDD <: OCClassifier
     C::Float64
     kernel_fct::Vector{Kernel}
     subspaces::Vector{Vector{Int}}
+    weight_update_strategy::Union{WeightUpdateStrategy, Nothing}
 
     # training data
     data::Array{Float64,2}
@@ -13,6 +14,7 @@ mutable struct SubSVDD <: OCClassifier
     adjust_K::Bool
     K_adjusted::Array{Array{Float64,2}}
     pools::Dict{Symbol, Array{Int64,1}}
+    v::Vector{Float64}
 
     # fitted values
     alpha_values::Vector{Vector{Float64}}
@@ -27,16 +29,22 @@ mutable struct SubSVDD <: OCClassifier
         m.data = data
         m.adjust_K = false
         m.pools = labelmap(pools)
+        m.v = fill(1.0, size(data,2))
         m.subspaces = subspaces
+        m.weight_update_strategy = nothing #NoUpdateStrategy()
         return m
     end
 end
 
-macro eachsubspace(expr)
-    args = esc.(expr.args)
-    sub_idx = :(eachindex($(args[2]).subspaces))
-    return :( [$(args[1])($(args[2:end,]...), k) for k in $sub_idx] )
+function get_model_params(model::SubSVDD)
+    return Dict(:C => model.C,
+                :subspaces => model.subspaces,
+                :weight_update_strategy => model.weight_update_strategy)
 end
+
+is_valid_param_value(model::SubSVDD, x::Type{Val{:C1}}, v) = 0 <= v <= 1
+is_valid_param_value(model::SubSVDD, x::Type{Val{:subspaces}}, v) = true
+is_valid_param_value(model::SubSVDD, x::Type{Val{:weight_update_strategy}}, v) = true
 
 function invalidate_solution!(model::SubSVDD)
     model.alpha_values = Vector{Vector{Float64}}()
@@ -49,6 +57,10 @@ end
 function set_C!(model::SubSVDD, C::Real)
     model.C = C
     return nothing
+end
+
+function update_weights!(model::SubSVDD)
+    model.v .= update_v.(model.v, pool2vec(model.pools), model.weight_update_strategy)
 end
 
 function fit!(model::SubSVDD, solver)
@@ -75,7 +87,7 @@ function solve!(model::SubSVDD, solver::JuMP.OptimizerFactory)
                             sum(α[i, k] * α[j, k] * K[k][i, j] for i in 1:n for j in 1:n)
                         for k in eachindex(model.subspaces)))
     for i in 1:n
-        @constraint(QP, sum(α[i, k] for k in eachindex(model.subspaces)) <= model.C)
+        @constraint(QP, sum(α[i, k] for k in eachindex(model.subspaces)) <= model.v[i] * model.C)
     end
 
     for k in eachindex(model.subspaces)
@@ -93,15 +105,12 @@ end
 ```
     Calculates the upper limits for support vectors in subspace subspace_idx
 ```
-function calculate_upper_limit(α::Vector{Vector{Float64}}, subspace_idx::Int, C::Float64, v::Vector{Float64})
+function calculate_upper_limit(α::Vector{Vector{Float64}}, C::Float64, v::Vector{Float64}, subspace_idx::Int)
     return v.*C .- sum([α[i] for i in 1:length(α) if i != subspace_idx])
 end
 
-calculate_upper_limit(α::Vector{Vector{Float64}}, subspace_idx::Int, C) =
-    calculate_upper_limit(α::Vector{Vector{Float64}}, subspace_idx::Int, C, fill(1.0, length(α[1])))
-
 function find_support_vectors(model::SubSVDD, subspace_idx)::Vector{Int}
-    upper_limits = SVDD.calculate_upper_limit(model.alpha_values, subspace_idx, model.C)
+    upper_limits = SVDD.calculate_upper_limit(model.alpha_values, model.C, model.v, subspace_idx)
     return findall((model.alpha_values[subspace_idx] .> SVDD.OPT_PRECISION) .& (model.alpha_values[subspace_idx] .< (upper_limits[subspace_idx] .- SVDD.OPT_PRECISION)))
 end
 

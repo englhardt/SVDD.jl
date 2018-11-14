@@ -3,7 +3,8 @@ module SVDD
 include("svdd_base.jl")
 include("svdd_util.jl")
 
-include("classifiers/classifier_sub_svdd.jl")
+include("classifiers/sub/classifier_sub_util.jl")
+include("classifiers/sub/classifier_sub_svdd.jl")
 
 include("classifiers/classifier.jl")
 include("classifiers/classifier_svdd.jl")

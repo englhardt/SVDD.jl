@@ -4,6 +4,14 @@ function merge_pools(pools, names...)
     return reduce((r, key) -> vcat(r, haskey(pools, key) ? pools[key] : Int64[]), unique(names); init=Int64[])
 end
 
+function pool2vec(pool::Dict{Symbol, Vector{Int}})
+    poolvec = Vector{Symbol}(UndefInitializer(), mapreduce(length, +, values(pool)))
+    for (k, v) in pool
+        poolvec[v] .= k
+    end
+    return poolvec
+end
+
 classify(x::Number) = x > 0 ? :outlier : :inlier
 
 function classify(predictions::Vector{Vector{Float64}}, scope::Scope)

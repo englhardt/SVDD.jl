@@ -11,7 +11,6 @@ function set_param!(model, param::Dict{Symbol, <:Any})
     for (k, v) in param
         k in keys(get_model_params(model)) || throw(ArgumentError("Model $(typeof(model)) has no parameter $k. Valid parameters are $(get_model_params(model))."))
         fieldtype = typeof(getfield(model, k))
-        typeof(v) == fieldtype || throw(ArgumentError("Cannot set parameter $k for $(typeof(model)), because the parameter type is $(typeof(v)) but the model expects $(fieldtype)."))
         is_valid_param_value(model, Val{k}, v) || throw(ArgumentError("Parameter $k has value $v which is outside the valid range for model $(typeof(model))."))
         if getfield(model,k) != v
             has_changed = true

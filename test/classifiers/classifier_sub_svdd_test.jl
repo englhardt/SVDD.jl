@@ -38,9 +38,10 @@
     end
 
     @testset "calculate_c_delta" begin
-        @test SVDD.calculate_upper_limit(model.alpha_values, 1, model.C) ≈ model.C .- model.alpha_values[2]
-        @test SVDD.calculate_upper_limit(model.alpha_values, 2, model.C) ≈ model.C .- model.alpha_values[1]
-        @test SVDD.calculate_upper_limit(model.alpha_values, 2, model.C, fill(0.5, size(model.data, 2))) ≈ 0.5*model.C .- model.alpha_values[1]
+        @test SVDD.calculate_upper_limit(model.alpha_values, model.C, model.v, 1) ≈ model.C .- model.alpha_values[2]
+        @test SVDD.calculate_upper_limit(model.alpha_values, model.C, model.v, 2) ≈ model.C .- model.alpha_values[1]
+        model.v .= 0.5
+        @test SVDD.calculate_upper_limit(model.alpha_values, model.C, model.v, 2) ≈ 0.5*model.C .- model.alpha_values[1]
     end
 
     @testset "@each_subspace" begin
