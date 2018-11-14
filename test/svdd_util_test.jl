@@ -33,8 +33,8 @@
                               [:outlier, :inlier, :inlier, :inlier, :outlier]]
             expected_global = [:outlier, :inlier, :outlier, :inlier, :outlier]
 
-            actual_local = SVDD.classify(scores, SVDD.Local)
-            actual_global = SVDD.classify(scores, SVDD.Global)
+            actual_local = SVDD.classify(scores, SVDD.SubspaceScope)
+            actual_global = SVDD.classify(scores, SVDD.GlobalScope)
             @test expected_local == actual_local
             @test expected_global == actual_global
         end

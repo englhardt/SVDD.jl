@@ -11,6 +11,9 @@ const OPT_PRECISION = 1e-7
 
 @enum ModelState model_created=1 model_initialized=2 model_fitted=3
 
+SubspaceScope = Val{:SubspaceScope}
+GlobalScope = Val{:GlobalScope}
+
 abstract type ModelException <: Exception end
 
 struct ModelStateException <: ModelException

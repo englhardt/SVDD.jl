@@ -109,13 +109,6 @@ function find_positive_alpha(model::SubSVDD, subspace_idx)
     return findall(model.alpha_values[subspace_idx] .> SVDD.OPT_PRECISION)
 end
 
-```
-    Returns the indices of support vectors for each subspace
-```
-function find_support_vectors(model::SubSVDD)::Vector{Vector{Int}}
-    [find_support_vectors(model, k) for k in eachindex(model.subspaces)]
-end
-
 function get_R_and_const_term(model::SubSVDD, subspace_idx)
     sv_idx = find_support_vectors(model, subspace_idx)
     α = model.alpha_values[subspace_idx]
