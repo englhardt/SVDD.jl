@@ -4,7 +4,7 @@ mutable struct SubSVDD <: OCClassifier
 
     # model parameters
     C::Float64
-    kernel_fct::Kernel
+    kernel_fct::Vector{Kernel}
     subspaces::Vector{Vector{Int}}
 
     # training data
@@ -129,14 +129,15 @@ predict(model::SubSVDD, subspace_idx) = predict(model, model.data, subspace_idx)
 
 # out of sample predict
 function predict(model::SubSVDD, target::Array{T,2}, subspace_idx) where T <: Real
+    model.state == model_fitted || throw(ModelStateException(model.state, model_fitted))
     @assert size(model.data, 1) == size(target, 1) "Dimension mismatch between model data and target.
         You have to provide the full data set, not the subspace projection."
 
     s = model.subspaces[subspace_idx]
     pos_sv_idx = find_positive_alpha(model, subspace_idx)
     function predict_observation(z)
-        kernel(model.kernel_fct, z, z) -
-             2 * sum(model.alpha_values[subspace_idx][i] * kernel(model.kernel_fct, model.data[s, i], z) for i in pos_sv_idx) +
+        kernel(model.kernel_fct[subspace_idx], z, z) -
+             2 * sum(model.alpha_values[subspace_idx][i] * kernel(model.kernel_fct[subspace_idx], model.data[s, i], z) for i in pos_sv_idx) +
              model.const_term[subspace_idx]
     end
     vec(sqrt.(mapslices(predict_observation, target[s, :], dims=1)) .- model.R[subspace_idx])

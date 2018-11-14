@@ -8,14 +8,17 @@
 
     @testset "create" begin
         @test model.state == SVDD.model_created
-        # @test_throws SVDD.ModelStateException SVDD.predict(model, dummy_data)
+        @test_throws SVDD.ModelStateException SVDD.predict(model, dummy_data)
     end
     C = 1.0
     gamma = 0.5
-    init_strategy = SVDD.FixedParameterInitialization(MLKernels.GaussianKernel(gamma), C)
+    gamma_strategy = FixedGammaStrategy(MLKernels.GaussianKernel(gamma))
+    C_strategy = FixedCStrategy(C)
+    init_strategy = SVDD.SimpleSubspaceStrategy(gamma_strategy, C_strategy, gamma_scope=SVDD.GlobalScope)
 
     @testset "initialize" begin
         SVDD.initialize!(model, init_strategy)
+        @test length(model.kernel_fct) == 2
         @test !(all(model.K[1] .≈ model.K[2]))
         @test model.state == SVDD.model_initialized
         @test model.data == dummy_data

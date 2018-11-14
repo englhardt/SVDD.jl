@@ -14,6 +14,8 @@ const OPT_PRECISION = 1e-7
 SubspaceScope = Val{:SubspaceScope}
 GlobalScope = Val{:GlobalScope}
 
+# const Scope = Union{Val{:Subspace}, Val{:Global}}
+
 abstract type ModelException <: Exception end
 
 struct ModelStateException <: ModelException

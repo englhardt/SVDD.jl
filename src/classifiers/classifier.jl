@@ -49,8 +49,12 @@ function set_adjust_K!(model, adjust_K::Bool)
 end
 
 is_K_adjusted(model)::Bool = model.adjust_K
+
 calculate_kernel_matrix(model) = MLKernels.kernelmatrix(Val(:col), model.kernel_fct, model.data)
-calculate_kernel_matrix(model::SubSVDD) = map(s -> MLKernels.kernelmatrix(Val(:col), model.kernel_fct, model.data[s,:]), model.subspaces)
+
+function calculate_kernel_matrix(model::SubSVDD)
+     map(k -> MLKernels.kernelmatrix(Val(:col), model.kernel_fct[k], model.data[model.subspaces[k],:]), eachindex(model.subspaces))
+ end
 
 function update_K!(model)
     updated_K = calculate_kernel_matrix(model)
@@ -76,7 +80,7 @@ function set_data!(model, data::Array{T, 2}) where T <: Real
     return nothing
 end
 
-function set_kernel!(model::OCClassifier, kernel_fct::Kernel)
+function set_kernel!(model::OCClassifier, kernel_fct)
     if !isdefined(model, :kernel_fct) || model.kernel_fct != kernel_fct
         model.kernel_fct = kernel_fct
         update_K!(model)
