@@ -101,6 +101,15 @@ function f1_scoring(predictions, ground_truth)
     return MLBase.f1score(MLBase.roc(ground_truth .== :outlier, predictions .== :outlier))
 end
 
+function calculate_gamma(model::SubSVDD, strategy::WangGammaStrategy, subspace_idx)
+    info(LOGGER, "[Gamma Search] Using VanillaSVDD to search for gamma in subspace $subspace_idx")
+    calculate_gamma(VanillaSVDD(model.data[model.subspaces[subspace_idx], :]), strategy)
+end
+
+function calculate_gamma(model::SubSVDD, strategy::WangGammaStrategy)
+    info(LOGGER, "[Gamma Search] Using VanillaSVDD to estimate a global gamma.")
+    calculate_gamma(VanillaSVDD(model.data), strategy)
+end
 function calculate_gamma(model, strategy::WangGammaStrategy)
     m = deepcopy(model)
     data_target, data_outliers = generate_binary_data_for_tuning(m.data)
