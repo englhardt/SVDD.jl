@@ -6,8 +6,8 @@ end
 
 classify(x::Number) = x > 0 ? :outlier : :inlier
 
-function classify(predictions::Vector{Vector{Float64}}, type::DataType)
-    if type <: SubspaceScope
+function classify(predictions::Vector{Vector{Float64}}, scope::Scope)
+    if isa(scope, Val{:Subspace})
         return map(x -> classify.(x), predictions)
     else
         is_global_outlier = mapreduce(x -> x .> 0, (a,b) -> a .| b, predictions)

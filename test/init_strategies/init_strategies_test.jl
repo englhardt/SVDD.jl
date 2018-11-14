@@ -105,7 +105,7 @@
                 strategy = SVDD.SimpleSubspaceStrategy(
                     gamma_strategy,
                     FixedCStrategy(1.0),
-                    gamma_scope = SVDD.SubspaceScope)
+                    gamma_scope = Val(:Subspace))
                 C, kernel = SVDD.get_parameters(model, strategy)
                 @test C ≈ 1.0
                 @test length(kernel) == 2

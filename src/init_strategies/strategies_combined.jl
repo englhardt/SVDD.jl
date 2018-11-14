@@ -27,7 +27,8 @@ end
 struct SimpleSubspaceStrategy <: InitializationStrategyCombined
     gamma_strategy::InitializationStrategyGamma
     C_strategy::InitializationStrategyC
-    gamma_scope
+    gamma_scope::Scope
+    
     function SimpleSubspaceStrategy(gamma_strategy, C_strategy; gamma_scope)
         new(gamma_strategy, C_strategy, gamma_scope)
     end
@@ -36,7 +37,7 @@ end
 function get_parameters(model, strategy::SimpleSubspaceStrategy)
     C = calculate_C(model, strategy.C_strategy)
 
-    if strategy.gamma_scope <: SubspaceScope
+    if isa(strategy.gamma_scope, Val{:Subspace})
         gamma = @eachsubspace calculate_gamma(model, strategy.gamma_strategy)
     else
         tmp = calculate_gamma(model, strategy.gamma_strategy)

@@ -14,7 +14,7 @@
     gamma = 0.5
     gamma_strategy = FixedGammaStrategy(MLKernels.GaussianKernel(gamma))
     C_strategy = FixedCStrategy(C)
-    init_strategy = SVDD.SimpleSubspaceStrategy(gamma_strategy, C_strategy, gamma_scope=SVDD.GlobalScope)
+    init_strategy = SVDD.SimpleSubspaceStrategy(gamma_strategy, C_strategy, gamma_scope=Val(:Global))
 
     @testset "initialize" begin
         SVDD.initialize!(model, init_strategy)
