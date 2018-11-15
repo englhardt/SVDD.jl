@@ -59,9 +59,12 @@ function set_C!(model::SubSVDD, C::Real)
     return nothing
 end
 
-function update_weights!(model::SubSVDD)
-    model.v .= update_v.(model.v, labelmap2vec(model.pools), model.weight_update_strategy)
+function update_weights!(model::SubSVDD, indices)
+    model.v[indices] .= update_v.(model.v[indices], labelmap2vec(model.pools)[indices], model.weight_update_strategy)
+    return nothing
 end
+
+update_weights!(model::SubSVDD) = update_weights!(model, 1:size(model.data, 2))
 
 function fit!(model::SubSVDD, solver)
     debug(LOGGER, "[FIT] Fitting $(typeof(model)).")

@@ -80,5 +80,10 @@
         @test model.v[2] ≈ 0.9
         @test all(model.v[3:end] .≈ 1.0)
 
+        poolvec[3:10] .= :Lout
+        set_pools!(model, labelmap(poolvec))
+        update_weights!(model, 3:4)
+        @test all(model.v[3:4] .≈ 0.9)
+        @test all(model.v[5:10] .≈ 1.0)
     end
 end
