@@ -45,14 +45,12 @@
     end
 
     @testset "@each_subspace" begin
-
         @testset "generic function" begin
             g(m, subspace_idx) = subspace_idx
             expected = [1, 2]
             actual = @eachsubspace g(model)
             @test expected == actual
         end
-
         @testset "predict" begin
             expected = @eachsubspace SVDD.predict(model)
             actual = [SVDD.predict(model, model.data, k) for k in eachindex(model.subspaces)]
@@ -67,5 +65,20 @@
         @test all(map(x -> all(x .< 1e-5), predictions))
     end
 
+    @testset "update_weights" begin
+        model.v .= 1.0
+        @assert model.weight_update_strategy == nothing
+        update_strategy = SVDD.FixedWeightStrategy(1.1, 0.9)
+        set_param!(model, Dict(:weight_update_strategy => update_strategy))
+        @assert model.weight_update_strategy == update_strategy
+        poolvec = labelmap2vec(model.pools)
+        poolvec[1] = :Lin
+        poolvec[2] = :Lout
+        set_pools!(model, labelmap(poolvec))
+        update_weights!(model)
+        @test model.v[1] ≈ 1.1
+        @test model.v[2] ≈ 0.9
+        @test all(model.v[3:end] .≈ 1.0)
 
+    end
 end

@@ -62,6 +62,8 @@ export
     set_data!,
     set_pools!,
     set_kappa!,
+    set_param!,
+    update_weights!,
     merge_pools,
     get_kernel,
     get_model_params,
