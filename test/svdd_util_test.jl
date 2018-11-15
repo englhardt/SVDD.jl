@@ -17,6 +17,22 @@
         @test_throws ArgumentError SVDD.merge_pools(pools, :A)
     end
 
+    @testset "labelmap2vec" begin
+        @testset "Symbol" begin
+            labelvec = [:yes,:no,:no,:yes,:yes]
+            @test labelvec == labelmap2vec(labelmap(labelvec))
+            labelvec = Vector{Symbol}(undef, 0)
+            @test labelvec == labelmap2vec(labelmap(labelvec))
+        end
+
+        @testset "Float64" begin
+            labelvec = [1.,-1,-1,1,1]
+            @test labelvec == labelmap2vec(labelmap(labelvec))
+            labelvec = Vector{Float64}(undef, 0)
+            @test labelvec == labelmap2vec(labelmap(labelvec))
+        end
+    end
+
     @testset "classify" begin
         @testset "single space" begin
             scores = [2.0, 0.0, 0.01, -0.1, -5.0]

@@ -68,5 +68,6 @@ export
 
     adjust_kernel_matrix!,
 
+    labelmap2vec,
     @eachsubspace
 end

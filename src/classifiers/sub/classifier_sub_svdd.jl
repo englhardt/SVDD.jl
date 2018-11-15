@@ -31,7 +31,7 @@ mutable struct SubSVDD <: OCClassifier
         m.pools = labelmap(pools)
         m.v = fill(1.0, size(data,2))
         m.subspaces = subspaces
-        m.weight_update_strategy = nothing #NoUpdateStrategy()
+        m.weight_update_strategy = nothing
         return m
     end
 end
@@ -60,7 +60,7 @@ function set_C!(model::SubSVDD, C::Real)
 end
 
 function update_weights!(model::SubSVDD)
-    model.v .= update_v.(model.v, pool2vec(model.pools), model.weight_update_strategy)
+    model.v .= update_v.(model.v, labelmap2vec(model.pools), model.weight_update_strategy)
 end
 
 function fit!(model::SubSVDD, solver)

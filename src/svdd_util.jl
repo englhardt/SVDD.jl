@@ -4,12 +4,13 @@ function merge_pools(pools, names...)
     return reduce((r, key) -> vcat(r, haskey(pools, key) ? pools[key] : Int64[]), unique(names); init=Int64[])
 end
 
-function pool2vec(pool::Dict{Symbol, Vector{Int}})
-    poolvec = Vector{Symbol}(UndefInitializer(), mapreduce(length, +, values(pool)))
-    for (k, v) in pool
-        poolvec[v] .= k
+function labelmap2vec(lm::Dict{T, Vector{Int}}) where T
+    isempty(lm) && return Vector{T}(undef, 0)
+    labelvec = Vector{T}(undef, mapreduce(length, +, values(lm)))
+    @inbounds for (k, v) in lm
+        labelvec[v] .= k
     end
-    return poolvec
+    return labelvec
 end
 
 classify(x::Number) = x > 0 ? :outlier : :inlier
