@@ -113,8 +113,12 @@ function calculate_upper_limit(α::Vector{Vector{Float64}}, C::Float64, v::Vecto
 end
 
 function find_support_vectors(model::SubSVDD, subspace_idx)::Vector{Int}
-    upper_limits = SVDD.calculate_upper_limit(model.alpha_values, model.C, model.v, subspace_idx)
-    return findall((model.alpha_values[subspace_idx] .> SVDD.OPT_PRECISION) .& (model.alpha_values[subspace_idx] .< (upper_limits[subspace_idx] .- SVDD.OPT_PRECISION)))
+    if length(model.subspaces) == 1
+        upper_limits = model.v .* model.C
+    else
+        upper_limits = SVDD.calculate_upper_limit(model.alpha_values, model.C, model.v, subspace_idx)
+    end
+    return findall((model.alpha_values[subspace_idx] .> SVDD.OPT_PRECISION) .& (model.alpha_values[subspace_idx] .< (upper_limits .- SVDD.OPT_PRECISION)))
 end
 
 function find_positive_alpha(model::SubSVDD, subspace_idx)
@@ -137,14 +141,13 @@ function get_R_and_const_term(model::SubSVDD, subspace_idx)
 end
 
 #TODO speed-up for in-sample predict by directly using kernel matrix
-predict(model::SubSVDD, subspace_idx) = predict(model, model.data, subspace_idx)
+predict(model::SubSVDD, subspace_idx) = predict(model, model.data[model.subspaces[subspace_idx], :], subspace_idx)
 
 # out of sample predict
 function predict(model::SubSVDD, target::Array{T,2}, subspace_idx) where T <: Real
     model.state == model_fitted || throw(ModelStateException(model.state, model_fitted))
-    @assert size(model.data, 1) == size(target, 1) "Dimension mismatch between model data and target.
+    @assert size(model.data[model.subspaces[subspace_idx], :], 1) == size(target, 1) "Dimension mismatch between model data and target.
         You have to provide the full data set, not the subspace projection."
-
     s = model.subspaces[subspace_idx]
     pos_sv_idx = find_positive_alpha(model, subspace_idx)
     function predict_observation(z)
@@ -152,5 +155,5 @@ function predict(model::SubSVDD, target::Array{T,2}, subspace_idx) where T <: Re
              2 * sum(model.alpha_values[subspace_idx][i] * kernel(model.kernel_fct[subspace_idx], model.data[s, i], z) for i in pos_sv_idx) +
              model.const_term[subspace_idx]
     end
-    vec(sqrt.(mapslices(predict_observation, target[s, :], dims=1)) .- model.R[subspace_idx])
+    vec(sqrt.(mapslices(predict_observation, target, dims=1)) .- model.R[subspace_idx])
 end

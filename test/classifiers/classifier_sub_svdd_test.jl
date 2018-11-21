@@ -8,7 +8,7 @@
 
     @testset "create" begin
         @test model.state == SVDD.model_created
-        @test_throws SVDD.ModelStateException SVDD.predict(model, dummy_data)
+        @test_throws SVDD.ModelStateException SVDD.predict(model, 1)
     end
     C = 1.0
     gamma = 0.5
@@ -44,6 +44,19 @@
         @test SVDD.calculate_upper_limit(model.alpha_values, model.C, model.v, 2) ≈ 0.5*model.C .- model.alpha_values[1]
     end
 
+    @testset "find_support_vectors" begin
+        dummy_model = SubSVDD(dummy_data, [[1,2]], pools)
+        dummy_model.alpha_values = [[0.1, 0.1-1e-10, 0.05, 0.0, 1e-10]]
+        dummy_model.v = ones(Float64, 5)
+        dummy_model.C = 0.1
+        @test SVDD.find_support_vectors(dummy_model, 1) == [3]
+
+        dummy_model.C = 0.2
+        dummy_model.subspaces = [[1,2], [3,4]]
+        push!(dummy_model.alpha_values, [0.09, 0.0, 0.0, 0.0, 0.0])
+        @test SVDD.find_support_vectors(dummy_model, 1) == [1,2,3]
+    end
+
     @testset "@each_subspace" begin
         @testset "generic function" begin
             g(m, subspace_idx) = subspace_idx
@@ -53,13 +66,13 @@
         end
         @testset "predict" begin
             expected = @eachsubspace SVDD.predict(model)
-            actual = [SVDD.predict(model, model.data, k) for k in eachindex(model.subspaces)]
+            actual = [SVDD.predict(model, k) for k in eachindex(model.subspaces)]
             @test all(expected .≈ actual)
         end
     end
 
     @testset "predict" begin
-        predictions = @eachsubspace SVDD.predict(model, model.data)
+        predictions = @eachsubspace SVDD.predict(model)
         @test length(predictions) == 2
         @test all(length.(predictions) .== size(model.data, 2))
         @test all(map(x -> all(x .< 1e-5), predictions))
