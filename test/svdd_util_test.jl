@@ -77,4 +77,12 @@
 
         @test_throws ArgumentError SVDD.adjust_kernel_matrix([3 -2; 4 -1])
     end
+
+    @testset "min_max_normalize" begin
+        @test min_max_normalize([1,2]) ≈ [0.0, 1.0]
+        @test min_max_normalize([-1,2]) ≈ [0.0, 1.0]
+        @test isnan(min_max_normalize(1))
+        @test isnan(min_max_normalize(-1))
+        @test min_max_normalize([0, 20, -20, 0]) ≈ [0.5, 1.0, 0.0, 0.5]
+    end
 end

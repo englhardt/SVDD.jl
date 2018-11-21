@@ -41,3 +41,8 @@ end
 function adjust_kernel_matrix(K::Vector{Vector{T}}; tolerance = 1e-15, warn_threshold = 1e-8) where T <: Real
     adjust_kernel_matrix.(K)
 end
+
+function min_max_normalize(x)
+   min, max = extrema(x)
+   (x .- min) ./ (max .- min)
+end
