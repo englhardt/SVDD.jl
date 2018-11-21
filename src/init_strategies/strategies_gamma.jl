@@ -1,11 +1,13 @@
 abstract type InitializationStrategyGamma <: InitializationStrategy end
 
 struct FixedGammaStrategy <: InitializationStrategyGamma
-    kernel::SquaredExponentialKernel
+    kernel
 end
 
 calculate_gamma(model, strategy::FixedGammaStrategy) = MLKernels.getvalue(strategy.kernel.alpha)
-calculate_gamma(model::SubSVDD, strategy::FixedGammaStrategy, subspace_idx) = calculate_gamma(model, strategy::FixedGammaStrategy)
+function calculate_gamma(model::SubSVDD, strategy::FixedGammaStrategy, subspace_idx)
+    MLKernels.getvalue(strategy.kernel[subspace_idx].alpha)
+end
 
 """
 Original publication:
@@ -51,7 +53,8 @@ struct WangGammaStrategy <: InitializationStrategyGamma
     scoring_function
 end
 
-WangGammaStrategy(solver) = WangGammaStrategy(solver, 10.0.^range(-2, stop=2, length=50), 1, f1_scoring)
+WangGammaStrategy(solver) = WangGammaStrategy(solver, 1.0)
+WangGammaStrategy(solver, C) = WangGammaStrategy(solver, 10.0.^range(-2, stop=2, length=50), C, f1_scoring)
 WangGammaStrategy(solver, gamma_search_range, C) = WangGammaStrategy(solver, gamma_search_range, C, f1_scoring)
 
 function generate_binary_data_for_tuning(data, k=nothing, threshold=0.1)
