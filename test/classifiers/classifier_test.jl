@@ -38,7 +38,7 @@ using MLKernels, MLLabelUtils
     @testset "set_param!" begin
         actual = deepcopy(vanilla_svdd)
         @test_throws ArgumentError SVDD.set_param!(actual, Dict(:C => "0.4", :Ψ => "ipd"))
-        @test_throws ArgumentError SVDD.set_param!(actual, Dict(:C => "0.4"))
+        @test_throws MethodError SVDD.set_param!(actual, Dict(:C => "0.4"))
         SVDD.set_param!(actual, Dict(:C => 0.5))
         @test actual.state == SVDD.model_fitted
         SVDD.set_param!(actual, Dict(:C => 0.4))
