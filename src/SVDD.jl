@@ -5,6 +5,7 @@ include("svdd_util.jl")
 
 include("classifiers/sub/classifier_sub_util.jl")
 include("classifiers/sub/classifier_sub_svdd.jl")
+include("classifiers/sub/classifier_sub_random.jl")
 
 include("classifiers/classifier.jl")
 include("classifiers/classifier_svdd.jl")
@@ -36,7 +37,7 @@ export
     SVDDneg,
     SSAD,
     SubSVDD,
-
+    
     SMOSolver,
 
     ModelSolverException, ModelStateException,
