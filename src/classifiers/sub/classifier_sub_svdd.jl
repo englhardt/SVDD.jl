@@ -1,5 +1,5 @@
 
-mutable struct SubSVDD <: OCClassifier
+mutable struct SubSVDD <: SubOCClassifier
     state::ModelState
 
     # model parameters
@@ -146,8 +146,7 @@ predict(model::SubSVDD, subspace_idx) = predict(model, model.data[model.subspace
 # out of sample predict
 function predict(model::SubSVDD, target::Array{T,2}, subspace_idx) where T <: Real
     model.state == model_fitted || throw(ModelStateException(model.state, model_fitted))
-    @assert size(model.data[model.subspaces[subspace_idx], :], 1) == size(target, 1) "Dimension mismatch between model data and target.
-        You have to provide the full data set, not the subspace projection."
+    @assert size(model.data[model.subspaces[subspace_idx], :], 1) == size(target, 1) "Dimension mismatch between model data and target."
     s = model.subspaces[subspace_idx]
     pos_sv_idx = find_positive_alpha(model, subspace_idx)
     function predict_observation(z)

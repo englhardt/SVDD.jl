@@ -3,6 +3,7 @@ module SVDD
 include("svdd_base.jl")
 include("svdd_util.jl")
 
+include("classifiers/sub/classifier_sub_update_strategies.jl")
 include("classifiers/sub/classifier_sub_util.jl")
 include("classifiers/sub/classifier_sub_svdd.jl")
 include("classifiers/sub/classifier_sub_random.jl")
@@ -37,7 +38,8 @@ export
     SVDDneg,
     SSAD,
     SubSVDD,
-    
+    SubOCClassifier,
+
     SMOSolver,
 
     ModelSolverException, ModelStateException,

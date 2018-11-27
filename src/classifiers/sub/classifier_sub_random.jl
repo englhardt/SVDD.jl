@@ -1,4 +1,4 @@
-mutable struct SubRandomOCClassifier <: OCClassifier
+mutable struct SubRandomOCClassifier <: SubOCClassifier
     data
     subspaces
     outlier_bias

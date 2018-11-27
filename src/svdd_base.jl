@@ -32,4 +32,6 @@ abstract type OCClassifier end
 
 abstract type SVDDClassifier <: OCClassifier end
 
+abstract type SubOCClassifier <: OCClassifier end
+
 abstract type InitializationStrategy end
