@@ -4,15 +4,6 @@ function merge_pools(pools, names...)
     return reduce((r, key) -> vcat(r, haskey(pools, key) ? pools[key] : Int64[]), unique(names); init=Int64[])
 end
 
-function labelmap2vec(lm::Dict{T, Vector{Int}}) where T
-    isempty(lm) && return Vector{T}(undef, 0)
-    labelvec = Vector{T}(undef, mapreduce(length, +, values(lm)))
-    @inbounds for (k, v) in lm
-        labelvec[v] .= k
-    end
-    return labelvec
-end
-
 classify(x::Number) = x > 0 ? :outlier : :inlier
 
 function classify(predictions::Vector{Vector{Float64}}, scope::Scope)

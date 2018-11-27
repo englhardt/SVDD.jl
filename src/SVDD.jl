@@ -74,6 +74,6 @@ export
     adjust_kernel_matrix!,
     min_max_normalize,
     
-    labelmap2vec,
     @eachsubspace
+
 end
