@@ -146,6 +146,9 @@ end
 predict(model::SubSVDD, subspace_idx) = predict(model, model.data[model.subspaces[subspace_idx], :], subspace_idx)
 
 # out of sample predict
+"""
+    target: data projected in subspace
+"""
 function predict(model::SubSVDD, target::Array{T,2}, subspace_idx) where T <: Real
     model.state == model_fitted || throw(ModelStateException(model.state, model_fitted))
     @assert size(model.data[model.subspaces[subspace_idx], :], 1) == size(target, 1) "Dimension mismatch between model data and target."
@@ -157,4 +160,12 @@ function predict(model::SubSVDD, target::Array{T,2}, subspace_idx) where T <: Re
              model.const_term[subspace_idx]
     end
     vec(sqrt.(mapslices(predict_observation, target, dims=1)) .- model.R[subspace_idx])
+end
+
+"""
+    target: fullspace data
+"""
+function predict(model::SubSVDD, target::Array{<:Real,2})
+    @assert size(model.data, 1) == size(target, 1)
+    map(idx -> predict(model, target[model.subspaces[idx], :], idx), eachindex(model.subspaces))
 end
