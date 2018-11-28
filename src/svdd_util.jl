@@ -29,7 +29,7 @@ function adjust_kernel_matrix(K::Array{T, 2}; tolerance = 1e-15, warn_threshold 
     return K_adjusted
 end
 
-function adjust_kernel_matrix(K::Vector{Vector{T}}; tolerance = 1e-15, warn_threshold = 1e-8) where T <: Real
+function adjust_kernel_matrix(K::Vector{Array{T, 2}}; tolerance = 1e-15, warn_threshold = 1e-8) where T <: Real
     adjust_kernel_matrix.(K)
 end
 

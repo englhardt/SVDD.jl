@@ -58,25 +58,39 @@
 
     @testset "adjust kernel" begin
         K1 = [2 -1 0; -1 2 -1; 0 -1 2]
-        @assert all(eigen(K1).values .> 0)
-        @test K1 ≈ SVDD.adjust_kernel_matrix(K1)
-
         K2 = [1 2; 2 1]
-        @assert any(eigen(K2).values .< 0)
-        K2_adjusted = SVDD.adjust_kernel_matrix(K2, warn_threshold = 2)
-        @test !(K2 ≈ K2_adjusted)
-        @test all(eigen(K2_adjusted).values .>= 0.0)
+        @testset "single space" begin
+            @assert all(eigen(K1).values .> 0)
+            @test K1 ≈ SVDD.adjust_kernel_matrix(K1)
 
-        Random.seed!(42)
-        dummy_data, _ = generate_mvn_with_outliers(2, 100, 42, true, true)
-        model = SVDD.VanillaSVDD(dummy_data)
-        init_strategy = SVDD.FixedParameterInitialization(MLKernels.GaussianKernel(4), 0.1)
-        SVDD.initialize!(model, init_strategy)
-        K_old = copy(model.K)
-        @assert any(eigen(model.K).values .< 0)
+            @assert any(eigen(K2).values .< 0)
+            K2_adjusted = SVDD.adjust_kernel_matrix(K2, warn_threshold = 2)
+            @test !(K2 ≈ K2_adjusted)
+            @test all(eigen(K2_adjusted).values .>= 0.0)
 
-        @test_throws ArgumentError SVDD.adjust_kernel_matrix([3 -2; 4 -1])
+            Random.seed!(42)
+            dummy_data, _ = generate_mvn_with_outliers(2, 100, 42, true, true)
+            model = SVDD.VanillaSVDD(dummy_data)
+            init_strategy = SVDD.FixedParameterInitialization(MLKernels.GaussianKernel(4), 0.1)
+            SVDD.initialize!(model, init_strategy)
+            K_old = copy(model.K)
+            @assert any(eigen(model.K).values .< 0)
+
+            @test_throws ArgumentError SVDD.adjust_kernel_matrix([3 -2; 4 -1])
+        end
+
+        @testset "subspaces" begin
+            K = [K1, K2]
+            @assert all(eigen(K[1]).values .> 0)
+            @assert any(eigen(K[2]).values .< 0)
+            K_adjusted = SVDD.adjust_kernel_matrix(K, warn_threshold = 2)
+            @test K[1] ≈ K_adjusted[1]
+            @test !(K[2] ≈ K_adjusted[2])
+            @test all(eigen(K_adjusted[2]).values .>= 0.0)
+        end
     end
+
+
 
     @testset "min_max_normalize" begin
         @test min_max_normalize([1,2]) ≈ [0.0, 1.0]
