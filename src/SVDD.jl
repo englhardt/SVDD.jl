@@ -54,6 +54,7 @@ export
     BoundedTaxErrorEstimate,
     RuleOfThumbSilverman,
     RuleOfThumbScott,
+    SimpleSubspaceStrategy,
 
     initialize!,
     fit!,
