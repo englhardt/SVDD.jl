@@ -11,7 +11,6 @@ function set_param!(model, param::Dict{Symbol, <:Any})
     for (k, v) in param
         k in keys(get_model_params(model)) || throw(ArgumentError("Model $(typeof(model)) has no parameter $k. Valid parameters are $(get_model_params(model))."))
         fieldtype = typeof(getfield(model, k))
-        typeof(v) == fieldtype || throw(ArgumentError("Cannot set parameter $k for $(typeof(model)), because the parameter type is $(typeof(v)) but the model expects $(fieldtype)."))
         is_valid_param_value(model, Val{k}, v) || throw(ArgumentError("Parameter $k has value $v which is outside the valid range for model $(typeof(model))."))
         if getfield(model,k) != v
             has_changed = true
@@ -50,8 +49,14 @@ end
 
 is_K_adjusted(model)::Bool = model.adjust_K
 
+calculate_kernel_matrix(model) = MLKernels.kernelmatrix(Val(:col), model.kernel_fct, model.data)
+
+function calculate_kernel_matrix(model::SubSVDD)
+     map(k -> MLKernels.kernelmatrix(Val(:col), model.kernel_fct[k], model.data[model.subspaces[k],:]), eachindex(model.subspaces))
+ end
+
 function update_K!(model)
-    updated_K = MLKernels.kernelmatrix(Val(:col), model.kernel_fct, model.data)
+    updated_K = calculate_kernel_matrix(model)
     if !isdefined(model, :K) || updated_K != model.K || (!isdefined(model, :K_adjusted) && model.adjust_K)
         debug(LOGGER, "[UPDATE_K] Updating Kernel matrix.")
         invalidate_solution!(model)
@@ -74,7 +79,7 @@ function set_data!(model, data::Array{T, 2}) where T <: Real
     return nothing
 end
 
-function set_kernel!(model::OCClassifier, kernel_fct::Kernel)
+function set_kernel!(model::OCClassifier, kernel_fct)
     if !isdefined(model, :kernel_fct) || model.kernel_fct != kernel_fct
         model.kernel_fct = kernel_fct
         update_K!(model)

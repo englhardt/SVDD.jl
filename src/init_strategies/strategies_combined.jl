@@ -23,3 +23,25 @@ function get_parameters(model, strategy::GammaFirstCombinedStrategy)
     C = calculate_C(model, strategy.C_strategy, MLKernels.GaussianKernel(gamma))
     return (C, MLKernels.GaussianKernel(gamma))
 end
+
+struct SimpleSubspaceStrategy <: InitializationStrategyCombined
+    gamma_strategy::InitializationStrategyGamma
+    C_strategy::InitializationStrategyC
+    gamma_scope::Scope
+    
+    function SimpleSubspaceStrategy(gamma_strategy, C_strategy; gamma_scope)
+        new(gamma_strategy, C_strategy, gamma_scope)
+    end
+end
+
+function get_parameters(model, strategy::SimpleSubspaceStrategy)
+    C = calculate_C(model, strategy.C_strategy)
+
+    if isa(strategy.gamma_scope, Val{:Subspace})
+        gamma = @eachsubspace calculate_gamma(model, strategy.gamma_strategy)
+    else
+        tmp = calculate_gamma(model, strategy.gamma_strategy)
+        gamma = fill(tmp, length(model.subspaces))
+    end
+    return (C, MLKernels.GaussianKernel.(gamma))
+end

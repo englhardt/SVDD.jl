@@ -3,12 +3,18 @@ module SVDD
 include("svdd_base.jl")
 include("svdd_util.jl")
 
+include("classifiers/sub/classifier_sub_update_strategies.jl")
+include("classifiers/sub/classifier_sub_util.jl")
+include("classifiers/sub/classifier_sub_svdd.jl")
+include("classifiers/sub/classifier_sub_random.jl")
+
 include("classifiers/classifier.jl")
 include("classifiers/classifier_svdd.jl")
 include("classifiers/classifier_svdd_vanilla.jl")
 include("classifiers/classifier_svdd_neg.jl")
 include("classifiers/classifier_ssad.jl")
 include("classifiers/classifier_randomOC.jl")
+
 
 include("init_strategies/strategies_C.jl")
 include("init_strategies/strategies_gamma.jl")
@@ -31,6 +37,8 @@ export
     VanillaSVDD,
     SVDDneg,
     SSAD,
+    SubSVDD,
+    SubOCClassifier,
 
     SMOSolver,
 
@@ -46,6 +54,7 @@ export
     BoundedTaxErrorEstimate,
     RuleOfThumbSilverman,
     RuleOfThumbScott,
+    SimpleSubspaceStrategy,
 
     initialize!,
     fit!,
@@ -57,9 +66,15 @@ export
     set_data!,
     set_pools!,
     set_kappa!,
+    set_param!,
+    update_weights!,
     merge_pools,
     get_kernel,
     get_model_params,
 
-    adjust_kernel_matrix!
+    adjust_kernel_matrix!,
+    min_max_normalize,
+    
+    @eachsubspace
+
 end

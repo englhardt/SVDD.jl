@@ -111,7 +111,7 @@ function fit!(model::SSAD, solver)
     debug(LOGGER, "[FIT] Fitting SSAD.")
     model.state == model_created && throw(ModelStateException(model.state, model_initialized))
     status = solve!(model, solver)
-    if status != :Optimal && model.kappa_fallback
+    if status != JuMP.MathOptInterface.Success && model.kappa_fallback
         debug(LOGGER, "[FIT] Solver returned with status != :Optimal. Retry with kappa = 0.0.")
         κ_orig = model.κ
         model.κ = 0.0

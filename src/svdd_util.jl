@@ -6,6 +6,15 @@ end
 
 classify(x::Number) = x > 0 ? :outlier : :inlier
 
+function classify(predictions::Vector{Vector{Float64}}, scope::Scope)
+    if isa(scope, Val{:Subspace})
+        return map(x -> classify.(x), predictions)
+    else
+        is_global_outlier = mapreduce(x -> x .> 0, (a,b) -> a .| b, predictions)
+        return ifelse.(is_global_outlier, :outlier, :inlier)
+    end
+end
+
 function adjust_kernel_matrix(K::Array{T, 2}; tolerance = 1e-15, warn_threshold = 1e-8) where T <: Real
     info(LOGGER, "Adjusting Kernel Matrix.")
     F = eigen(K)
@@ -18,4 +27,13 @@ function adjust_kernel_matrix(K::Array{T, 2}; tolerance = 1e-15, warn_threshold 
     info(LOGGER, "[ADJUST KERNEL] Maximum adjustemt of kernel matrix entry is $max_adjustment. The sum of adjustments is $(sum_adjustment)")
     max_adjustment .> warn_threshold && warn(LOGGER, "[ADJUST KERNEL] Maximum adjustment of kernel matrix entry exceeded the threshold of $(warn_threshold)!.")
     return K_adjusted
+end
+
+function adjust_kernel_matrix(K::Vector{Array{T, 2}}; tolerance = 1e-15, warn_threshold = 1e-8) where T <: Real
+    adjust_kernel_matrix.(K)
+end
+
+function min_max_normalize(x)
+   min, max = extrema(x)
+   (x .- min) ./ (max .- min)
 end

@@ -12,6 +12,6 @@
 
     solver = SMOSolver(1e-2, 1000)
     status = SVDD.fit!(model, solver)
-    @test status == :Optimal
+    @test status == JuMP.MathOptInterface.Success
     @test model.R > 0
 end
