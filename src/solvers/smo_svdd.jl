@@ -156,7 +156,7 @@ function smo(α, K, C, opt_precision, max_iterations)
         # scan over all data
         KKT_violation_all_idx = filter(i -> violates_KKT_condition(i, distances_to_decision_boundary, α, C, opt_precision) && i ∉ black_list, eachindex(α))
         if isempty(KKT_violation_all_idx)
-            return build_result(α, distances_to_decision_boundary, R, K, C, opt_precision, :Optimal, "No more KKT_violations.")
+            return build_result(α, distances_to_decision_boundary, R, K, C, opt_precision, JuMP.MathOptInterface.Success, "No more KKT_violations.")
         else
             distances_to_center, distances_to_decision_boundary, R = examine_and_update_predictions!(α, distances_to_center, distances_to_decision_boundary, R, KKT_violation_all_idx, black_list, K, C, opt_precision)
         end
@@ -182,7 +182,7 @@ function calculate_duality_gap(α, distances_to_decision_boundary, R, K, C, opt_
 end
 
 function build_result(α, distances_to_decision_boundary, R, K, C, opt_precision, status, msg)
-    if status == :Optimal
+    if status == JuMP.MathOptInterface.Success
         info(LOGGER, "Exit with status: $status. ($msg)")
     else
         warn(LOGGER, "Exit with status: $status. ($msg)")

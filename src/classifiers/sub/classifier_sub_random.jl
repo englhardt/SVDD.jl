@@ -14,7 +14,7 @@ get_model_params(model::SubRandomOCClassifier) = (:Ϟ => 0.42, :param2 => 5)
 
 function fit!(model::SubRandomOCClassifier, solver)
     debug(LOGGER, "[FIT] $(typeof(model)) always returns :Optimal.")
-    return :Optimal
+    return JuMP.MathOptInterface.Success
 end
 
 function predict(model::SubRandomOCClassifier, target::Array{T,2}, subspace_idx) where T <: Real
