@@ -36,6 +36,8 @@ mutable struct SubSVDD <: SubOCClassifier
     end
 end
 
+SubSVDD(data, pools::Vector{Symbol}) = SubSVDD(data, [], pools)
+
 function get_model_params(model::SubSVDD)
     return Dict(:C => model.C,
                 :subspaces => model.subspaces,
