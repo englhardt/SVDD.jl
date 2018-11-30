@@ -61,13 +61,6 @@ function set_C!(model::SubSVDD, C::Real)
     return nothing
 end
 
-function update_weights!(model::SubSVDD, indices)
-    model.v[indices] .= update_v.(model.v[indices], labelmap2vec(model.pools)[indices], model.weight_update_strategy)
-    return nothing
-end
-
-update_weights!(model::SubSVDD) = update_weights!(model, 1:size(model.data, 2))
-
 function fit!(model::SubSVDD, solver)
     debug(LOGGER, "[FIT] Fitting $(typeof(model)).")
     model.state == model_created && throw(ModelStateException(model.state, model_initialized))
@@ -168,4 +161,21 @@ end
 function predict(model::SubSVDD, target::Array{<:Real,2})
     @assert size(model.data, 1) == size(target, 1)
     map(idx -> predict(model, target[model.subspaces[idx], :], idx), eachindex(model.subspaces))
+end
+
+function apply_update_strategy!(model::SubSVDD, new_pools::Vector{Symbol}, query_ids::Vector{Int},
+    old_idx_remaining::Vector{Int},
+    new_idx_remaining::Vector{Int})
+
+    model.weight_update_strategy === nothing && error("Cannot update $(typeof(model)) with update strategy 'nothing'.")
+    @assert length(old_idx_remaining) == length(new_idx_remaining)
+
+    old_v = copy(model.v[old_idx_remaining])
+    model.v = fill(get_default_v(model.weight_update_strategy), length(new_pools))
+    model.v[new_idx_remaining] .= old_v
+
+    for q_id in query_ids
+        model.v[q_id] = update_v(model.v[q_id], new_pools[q_id], model.weight_update_strategy)
+    end
+    return nothing
 end

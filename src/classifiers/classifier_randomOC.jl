@@ -33,3 +33,7 @@ function set_data!(model::RandomOCClassifier, data::Array{T, 2}) where T <: Real
     model.data = data
     return nothing
 end
+
+update_with_feedback!(model::RandomOCClassifier, new_data, new_pools::Vector{Symbol}, query_ids::Vector{Int},
+    old_idx_remaining::Vector{Int},
+    new_idx_remaining::Vector{Int}) = nothing

@@ -99,3 +99,19 @@ function initialize!(model::OCClassifier, strategy::InitializationStrategy)
 end
 
 get_kernel(model::OCClassifier) = model.kernel_fct
+
+apply_update_strategy!(model, new_pools, query_ids, old_idx_remaining, new_idx_remaining) = nothing
+
+function update_with_feedback!(model, new_data, new_pools::Vector{Symbol}, query_ids::Vector{Int},
+    old_idx_remaining::Vector{Int},
+    new_idx_remaining::Vector{Int})
+    @assert size(new_data, 2) == length(new_pools)
+    @assert islabelenc(new_pools, SVDD.learning_pool_enc)
+
+    apply_update_strategy!(model, new_pools, query_ids, old_idx_remaining, new_idx_remaining)
+
+    set_pools!(model, new_pools)
+    set_data!(model, new_data)
+    invalidate_solution!(model)
+    return nothing
+end

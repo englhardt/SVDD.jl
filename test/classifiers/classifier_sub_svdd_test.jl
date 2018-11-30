@@ -78,25 +78,28 @@
         @test all(map(x -> all(x .< 1e-5), predictions))
     end
 
-    @testset "update_weights" begin
+    @testset "update_with_feedback" begin
         model.v .= 1.0
-        @assert model.weight_update_strategy == nothing
+        expected_pools = labelmap2vec(model.pools)
+        dummy_remaining_indices = collect(eachindex(expected_pools))
+
+        @assert model.weight_update_strategy === nothing
+        @test_throws ErrorException update_with_feedback!(model, model.data, expected_pools, [1], dummy_remaining_indices, dummy_remaining_indices)
+
         update_strategy = SVDD.FixedWeightStrategy(1.1, 0.9)
         set_param!(model, Dict(:weight_update_strategy => update_strategy))
-        @assert model.weight_update_strategy == update_strategy
-        poolvec = labelmap2vec(model.pools)
-        poolvec[1] = :Lin
-        poolvec[2] = :Lout
-        set_pools!(model, labelmap(poolvec))
-        update_weights!(model)
+        @test model.weight_update_strategy == update_strategy
+
+        update_with_feedback!(model, model.data, expected_pools, Int[], dummy_remaining_indices, dummy_remaining_indices)
+        @test labelmap2vec(model.pools) == expected_pools
+
+        query_ids = [1,2]
+        query_pool_labels = [:Lin, :Lout]
+        expected_pools[query_ids] .= query_pool_labels
+        update_with_feedback!(model, model.data, expected_pools, query_ids, dummy_remaining_indices, dummy_remaining_indices)
         @test model.v[1] ≈ 1.1
         @test model.v[2] ≈ 0.9
         @test all(model.v[3:end] .≈ 1.0)
-
-        poolvec[3:10] .= :Lout
-        set_pools!(model, labelmap(poolvec))
-        update_weights!(model, 3:4)
-        @test all(model.v[3:4] .≈ 0.9)
-        @test all(model.v[5:10] .≈ 1.0)
+        @test labelmap2vec(model.pools) == expected_pools
     end
 end

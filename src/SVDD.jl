@@ -3,7 +3,7 @@ module SVDD
 include("svdd_base.jl")
 include("svdd_util.jl")
 
-include("classifiers/sub/classifier_sub_update_strategies.jl")
+include("classifiers/sub/update_strategies.jl")
 include("classifiers/sub/classifier_sub_util.jl")
 include("classifiers/sub/classifier_sub_svdd.jl")
 include("classifiers/sub/classifier_sub_random.jl")
@@ -59,6 +59,7 @@ export
 
     initialize!,
     fit!,
+    update_with_feedback!,
     predict,
     classify,
 
