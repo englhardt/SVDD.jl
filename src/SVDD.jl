@@ -54,6 +54,7 @@ export
     BoundedTaxErrorEstimate,
     RuleOfThumbSilverman,
     RuleOfThumbScott,
+    WangGammaStrategy,
     SimpleSubspaceStrategy,
 
     initialize!,
@@ -74,7 +75,7 @@ export
 
     adjust_kernel_matrix!,
     min_max_normalize,
-    
+
     @eachsubspace
 
 end
