@@ -4,13 +4,13 @@ function merge_pools(pools, names...)
     return reduce((r, key) -> vcat(r, haskey(pools, key) ? pools[key] : Int64[]), unique(names); init=Int64[])
 end
 
-classify(x::Number) = x > 0 ? :outlier : :inlier
+classify(x::Number; opt_precision = OPT_PRECISION) = x > opt_precision ? :outlier : :inlier
 
-function classify(predictions::Vector{Vector{Float64}}, scope::Scope)
+function classify(predictions::Vector{Vector{Float64}}, scope::Scope; opt_precision = OPT_PRECISION)
     if isa(scope, Val{:Subspace})
-        return map(x -> classify.(x), predictions)
+        return map(x -> classify.(x; opt_precision = opt_precision), predictions)
     else
-        is_global_outlier = mapreduce(x -> x .> 0, (a,b) -> a .| b, predictions)
+        is_global_outlier = mapreduce(x -> x .> opt_precision, (a,b) -> a .| b, predictions)
         return ifelse.(is_global_outlier, :outlier, :inlier)
     end
 end
