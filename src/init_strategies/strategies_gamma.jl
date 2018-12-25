@@ -119,7 +119,7 @@ function calculate_gamma(model, strategy::WangGammaStrategy)
     ground_truth = vcat(fill(:inlier, size(m.data, 2) + size(data_target, 2)),
                     fill(:outlier, size(data_outliers, 2)))
 
-    debug(LOGGER, "[Gamma Search] Searching for parameter C.")
+    debug(LOGGER, "[Gamma Search] Searching for parameter gamma.")
     best_gamma = 1.0
     best_score = -Inf
     for gamma in strategy.gamma_search_range
@@ -131,7 +131,7 @@ function calculate_gamma(model, strategy::WangGammaStrategy)
             fit!(m, strategy.solver)
         catch e
             debug(LOGGER, "[Gamma Search] Fitting failed for gamma $gamma.")
-            println(e)
+            debug(LOGGER, e)
             continue
         end
         predictions = classify.(predict(m, hcat(m.data, data_target, data_outliers)));
@@ -142,5 +142,6 @@ function calculate_gamma(model, strategy::WangGammaStrategy)
             best_score = score
         end
     end
+    info(LOGGER, "[Gamma Search] Finished.")
     return best_gamma
 end
