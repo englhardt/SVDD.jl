@@ -13,7 +13,7 @@ get_model_params(model::RandomOCClassifier) = (:Ϟ => 0.42, :param2 => 5)
 
 function fit!(model::RandomOCClassifier, solver)
     debug(LOGGER, "[FIT] $(typeof(model)) always returns :Optimal.")
-    return JuMP.MathOptInterface.Success
+    return JuMP.MathOptInterface.OPTIMAL
 end
 
 function predict(model::RandomOCClassifier, target::Array{T,2}) where T <: Real

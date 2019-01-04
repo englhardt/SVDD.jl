@@ -110,8 +110,15 @@ end
 function fit!(model::SSAD, solver)
     debug(LOGGER, "[FIT] Fitting SSAD.")
     model.state == model_created && throw(ModelStateException(model.state, model_initialized))
-    status = solve!(model, solver)
-    if status != JuMP.MathOptInterface.Success && model.kappa_fallback
+
+    # Workaround; Gurobi throws "Gurobi.GurobiError(10005, "Unable to retrieve attribute 'UnbdRay'")" instead of setting solver status
+    try
+        status = solve!(model, solver)
+    catch e
+        status = JuMP.MathOptInterface.OTHER_ERROR
+    end
+
+    if status != JuMP.MathOptInterface.OPTIMAL && model.kappa_fallback
         debug(LOGGER, "[FIT] Solver returned with status != :Optimal. Retry with kappa = 0.0.")
         κ_orig = model.κ
         model.κ = 0.0
@@ -151,7 +158,7 @@ function solve!(model::SSAD, solver::JuMP.OptimizerFactory)
     JuMP.optimize!(QP)
     status = JuMP.termination_status(QP)
     debug(LOGGER, "[SOLVE] Finished with status: $(status).")
-    model.alpha_values = JuMP.result_value.(α)
+    model.alpha_values = JuMP.value.(α)
     return status
 end
 
