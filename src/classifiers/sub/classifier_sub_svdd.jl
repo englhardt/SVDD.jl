@@ -103,7 +103,7 @@ function solve!(model::SubSVDD, solver::JuMP.OptimizerFactory)
     JuMP.optimize!(QP)
     status = JuMP.termination_status(QP)
     debug(LOGGER, "[SOLVE] Finished with status: $(status).")
-    model.alpha_values = [JuMP.result_value.(α)[:, k] for k in eachindex(model.subspaces)]
+    model.alpha_values = [JuMP.value.(α)[:, k] for k in eachindex(model.subspaces)]
     return status
 end
 
