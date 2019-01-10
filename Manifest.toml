@@ -39,9 +39,9 @@ version = "1.4.0"
 
 [[DataStructures]]
 deps = ["InteractiveUtils", "OrderedCollections", "Random", "Serialization", "Test"]
-git-tree-sha1 = "8fc6e166e24fda04b2b648d4260cdad241788c54"
+git-tree-sha1 = "ca971f03e146cf144a9e2f2ce59674f5bf0e8038"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.14.0"
+version = "0.15.0"
 
 [[Dates]]
 deps = ["Printf"]
@@ -166,9 +166,9 @@ version = "0.4.0"
 
 [[MLLabelUtils]]
 deps = ["LearnBase", "MappedArrays", "StatsBase", "Test"]
-git-tree-sha1 = "e0ec57f450c345dbdaff191f4974b22407ed363f"
+git-tree-sha1 = "396eecfa05bf6e7628fc5fc3820545fce6620623"
 uuid = "66a33bbf-0c2b-5fc8-a008-9da813334f0a"
-version = "0.5.0"
+version = "0.5.1"
 
 [[MappedArrays]]
 deps = ["Test"]
@@ -344,9 +344,9 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[TimeZones]]
 deps = ["Compat", "EzXML", "Mocking", "Nullables"]
-git-tree-sha1 = "b311ce189caedf9e3fb2c9ab9135bb43e4cdfe8b"
+git-tree-sha1 = "bd6bd042be107147824eb583aed41d027b69704b"
 uuid = "f269a46b-ccf7-5d73-abea-4c690281aa53"
-version = "0.8.3"
+version = "0.8.4"
 
 [[URIParser]]
 deps = ["Test", "Unicode"]
