@@ -28,7 +28,7 @@ struct SimpleSubspaceStrategy <: InitializationStrategyCombined
     gamma_strategy::InitializationStrategyGamma
     C_strategy::InitializationStrategyC
     gamma_scope::Scope
-    
+
     function SimpleSubspaceStrategy(gamma_strategy, C_strategy; gamma_scope)
         new(gamma_strategy, C_strategy, gamma_scope)
     end
@@ -44,4 +44,22 @@ function get_parameters(model, strategy::SimpleSubspaceStrategy)
         gamma = fill(tmp, length(model.subspaces))
     end
     return (C, MLKernels.GaussianKernel.(gamma))
+end
+
+"""
+    Determines C for WangGammaStrategy by using a provided C init strategy
+"""
+struct WangCombinedInitializationStrategy <: InitializationStrategyCombined
+    solver::JuMP.OptimizerFactory
+    gamma_search_range
+    C_strategy::InitializationStrategyC
+end
+
+WangCombinedInitializationStrategy(solver, C_strategy) = WangCombinedInitializationStrategy(solver, 10.0.^range(-2, stop=2, length=50), C_strategy)
+
+function get_parameters(model, strategy::WangCombinedInitializationStrategy)
+    C = calculate_C(model, strategy.C_strategy)
+    wang_strategy = WangGammaStrategy(strategy.solver, strategy.gamma_search_range, C)
+    gamma = calculate_gamma(model, wang_strategy)
+    return (C, MLKernels.GaussianKernel(gamma))
 end
