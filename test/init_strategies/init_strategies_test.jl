@@ -128,4 +128,15 @@
         SVDD.fit!(model, TEST_SOLVER)
         @test all(SVDD.classify.(SVDD.predict(model, dummy_data)) .== labels)
     end
+
+    @testset "WangCombinedInitializationStrategy" begin
+        model = SVDD.VanillaSVDD(dummy_data[:, labels .== :inlier])
+        fixed_C = 0.95
+        init_strategy = SVDD.WangCombinedInitializationStrategy(TEST_SOLVER, [0.1, 0.5], SVDD.FixedCStrategy(fixed_C))
+
+        SVDD.initialize!(model, init_strategy)
+        SVDD.fit!(model, TEST_SOLVER)
+        @test get_model_params(model)[:C] == fixed_C
+        @test all(SVDD.classify.(SVDD.predict(model, dummy_data)) .== labels)
+    end
 end

@@ -55,6 +55,7 @@ export
     RuleOfThumbSilverman,
     RuleOfThumbScott,
     WangGammaStrategy,
+    WangCombinedInitializationStrategy,
     SimpleSubspaceStrategy,
 
     initialize!,
