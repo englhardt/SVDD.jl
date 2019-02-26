@@ -116,6 +116,11 @@ end
 function calculate_gamma(model, strategy::WangGammaStrategy)
     m = deepcopy(model)
     data_target, data_outliers = generate_binary_data_for_tuning(m.data)
+    data_predictions = if isempty(data_target)
+            hcat(m.data, data_outliers)
+        else
+            hcat(m.data, data_target, data_outliers)
+        end
     ground_truth = vcat(fill(:inlier, size(m.data, 2) + size(data_target, 2)),
                     fill(:outlier, size(data_outliers, 2)))
 
@@ -134,7 +139,7 @@ function calculate_gamma(model, strategy::WangGammaStrategy)
             debug(LOGGER, e)
             continue
         end
-        predictions = classify.(predict(m, hcat(m.data, data_target, data_outliers)));
+        predictions = classify.(predict(m, data_predictions))
         score = strategy.scoring_function(ground_truth, predictions)
         if score > best_score
             debug(LOGGER, "[Gamma Search] New best found with gamma = $gamma and score = $score.")
