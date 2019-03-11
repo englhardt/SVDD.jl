@@ -16,6 +16,7 @@ include("test_utils.jl")
     include("classifiers/classifier_ssad_test.jl")
     include("classifiers/classifier_svdd_test.jl")
     include("classifiers/classifier_svdd_neg_test.jl")
+    include("classifiers/classifier_svdd_neg_eps_test.jl")
     include("classifiers/classifier_svdd_vanilla_test.jl")
     include("classifiers/classifier_sub_svdd_test.jl")
 

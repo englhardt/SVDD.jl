@@ -12,6 +12,7 @@ include("classifiers/classifier.jl")
 include("classifiers/classifier_svdd.jl")
 include("classifiers/classifier_svdd_vanilla.jl")
 include("classifiers/classifier_svdd_neg.jl")
+include("classifiers/classifier_svdd_neg_eps.jl")
 include("classifiers/classifier_ssad.jl")
 include("classifiers/classifier_randomOC.jl")
 
@@ -36,6 +37,7 @@ export
     OCClassifier,
     VanillaSVDD,
     SVDDneg,
+    SVDDnegEps,
     SSAD,
     SubSVDD,
     SubOCClassifier,
