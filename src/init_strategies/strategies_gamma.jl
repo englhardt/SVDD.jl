@@ -77,6 +77,7 @@ function generate_binary_data_for_tuning(data, k=nothing, threshold=0.1)
             # add new edge
             push!(edge_idx, i)
             push!(norm_vec, n_i)
+            l_ns += 1 / k * sum(dist)
         end
 
         # generate pseudo inlier
@@ -87,7 +88,6 @@ function generate_binary_data_for_tuning(data, k=nothing, threshold=0.1)
             x_ij_min_positive = minimum(Λ_i_positive[Λ_i_positive .> 0])
             push!(data_target, data[:, i] + x_ij_min_positive * n_i)
         end
-        l_ns += 1 / k * sum(dist)
     end
 
     # compute negative shift amount
