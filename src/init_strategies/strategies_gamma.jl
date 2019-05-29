@@ -45,6 +45,12 @@ end
 Generate binary data to tune a one class classifier according to the following paper:
 Wang, S. et al. 2018. Hyperparameter selection of one-class support vector machine by self-adaptive data
 shifting. Pattern Recognition. 74, 2018.
+
+Changes compared to the paper:
+1. We only use the strategy here to fit gamma and not a combination of gamma and C.
+2. We also fit on the real data. This is because the algorithm sometimes generates no pseudo inliers.
+3. We test on pseudo-inliers, pseudo-outliers and real data. We assume that the real data are all inliers when testing.
+4. We use the F1 score instead of an averaged FNR and FPR.
 """
 struct WangGammaStrategy <: InitializationStrategyGamma
     solver
@@ -80,8 +86,8 @@ function generate_binary_data_for_tuning(data, k=nothing, threshold=0.1)
             l_ns += 1 / k * sum(dist)
         end
 
-        # generate pseudo inlier
-        n_i = normalize(vec(n_i))
+        # generate pseudo inlier (shift direction is ∇p(x) = -n)
+        n_i = -normalize(vec(n_i))
         Λ_i_positive = sum(n_i .* (data[:, idx[2:end]] .- data[:, i]), dims=1)
         if length(Λ_i_positive[Λ_i_positive .> 0]) > 0
             # shift along positive direction of data density gradient
