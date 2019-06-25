@@ -67,6 +67,7 @@ export
     classify,
 
     instantiate,
+    is_K_adjusted,
     set_adjust_K!,
     set_data!,
     set_pools!,

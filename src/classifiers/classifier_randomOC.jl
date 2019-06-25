@@ -1,9 +1,11 @@
 mutable struct RandomOCClassifier <: OCClassifier
     data
     outlier_bias
-    RandomOCClassifier(data) = new(data, 0.1)
+    adjust_K::Bool
+    kernel_fct::Kernel
+    RandomOCClassifier(data) = new(data, 0.1, false, MLKernels.GaussianKernel(2.0))
     RandomOCClassifier(data, pools::Vector) = RandomOCClassifier(data)
-    RandomOCClassifier(data, outlier_bias::Float64) = new(data, outlier_bias)
+    RandomOCClassifier(data, outlier_bias::Float64) = new(data, outlier_bias, false, MLKernels.GaussianKernel(2.0))
     RandomOCClassifier(data, outlier_bias::Float64, pools::Vector) = RandomOCClassifier(data, outlier_bias)
 end
 
@@ -22,7 +24,7 @@ end
 
 initialize!(model::RandomOCClassifier, strategy::InitializationStrategy) = nothing
 
-get_kernel(model::RandomOCClassifier) = nothing
+get_kernel(model::RandomOCClassifier) = model.kernel_fct
 
 invalidate_solution!(model::RandomOCClassifier) = nothing
 
