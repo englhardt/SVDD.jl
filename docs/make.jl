@@ -6,11 +6,12 @@ makedocs(
     pages = [
         "Home" => "index.md",
         "Getting Started" => "start.md",
+        "SVDD" => "svdd.md",
         "Custom Solvers" => [
             "SMO" => "smo.md"
             ]
         ],
-    format = :html,
+    format = Documenter.HTML(),
     modules = [SVDD]
 )
 deploydocs(

@@ -1,4 +1,4 @@
-# SMO
+# [SMO](@id smo_doc)
 
 Sequential Minimal Optimization (SMO) is a decomposition method to solve quadratic optimization problems with a specific structure. The original SMO algorithm by John C. Platt has been proposed for Support Vector Machines (SVM). There are several modifications for other types of support vector machines. This section describes the implementation of SMO for Support Vector Data Description (SVDD) [2].
 
@@ -24,7 +24,7 @@ The Lagrangian Dual is:
 ```math
 \begin{aligned}
 D: \ & \underset{\alpha}{\text{maximize}}
-& & \sum_{i,j}\alpha_i\alpha_j K_{i,j} + \sum_i \alpha_iK_{i,i}  \\
+& & \sum_i \alpha_iK_{i,i} - \sum_{i,j}\alpha_i\alpha_j K_{i,j} \\
 & \text{subject to}
 & & \sum_i \alpha_i = 1 \\
 & & & 0 \leq \alpha_i \leq C, \; ∀ i \\

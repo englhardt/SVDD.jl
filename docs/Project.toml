@@ -1,2 +1,3 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+SVDD = "83536b18-e0df-11e8-1e3f-f991e449cee4"
