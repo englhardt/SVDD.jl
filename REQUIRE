@@ -1,9 +1,0 @@
-julia 0.7
-MLKernels
-MLLabelUtils
-JuMP
-Ipopt
-Distributions
-StatsBase
-Memento
-Compat
