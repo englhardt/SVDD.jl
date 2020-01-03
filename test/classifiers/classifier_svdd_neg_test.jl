@@ -39,7 +39,7 @@
 
         actual = SVDD.predict(svdd_neg, dummy_data)
 
-        @test_broken expected ≈ actual
+        @test expected ≈ actual
         @test sum(actual .> 0) == sum(labels .== :outlier)
     end
 
