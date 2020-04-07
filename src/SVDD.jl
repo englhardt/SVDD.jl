@@ -56,6 +56,8 @@ export
     BoundedTaxErrorEstimate,
     RuleOfThumbSilverman,
     RuleOfThumbScott,
+    MeanCriterion,
+    ModifiedMeanCriterion,
     WangGammaStrategy,
     WangCombinedInitializationStrategy,
     SimpleSubspaceStrategy,
