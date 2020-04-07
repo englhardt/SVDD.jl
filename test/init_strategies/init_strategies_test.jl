@@ -6,16 +6,10 @@
     pools = fill(:U, size(dummy_data, 2))
     model = SVDD.VanillaSVDD(dummy_data)
 
-    @testset "RuleOfThumbSilverman" begin
-        # see https://docs.scipy.org/doc/scipy-0.19.0/reference/generated/scipy.stats.gaussian_kde.html
-        expected = (n * (d + 2) / 4.0)^(-1.0 / (d + 4))
-        @test expected == SVDD.calculate_gamma(model, SVDD.RuleOfThumbSilverman())
-    end
-
-    @testset "RuleOfThumbScott" begin
-        # see https://docs.scipy.org/doc/scipy-0.19.0/reference/generated/scipy.stats.gaussian_kde.html
-        expected = n^(-1.0 / (d + 4))
-        @test expected == SVDD.calculate_gamma(model, SVDD.RuleOfThumbScott())
+    for s in [:RuleOfThumbSilverman, :RuleOfThumbScott]
+        @testset "$s" begin
+            @test SVDD.calculate_gamma(model, SVDD.eval(s)()) > 0
+        end
     end
 
     @testset "TaxErrorEstimate" begin
