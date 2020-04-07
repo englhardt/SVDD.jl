@@ -16,7 +16,8 @@ Silverman, Bernard W. Density estimation for statistics and data analysis. Routl
 struct RuleOfThumbSilverman <: InitializationStrategyGamma end
 
 function rule_of_thumb_silverman(data::Array{T,2}) where T <: Real
-    return (size(data, 2) * (size(data, 1) + 2) / 4.0)^(-1.0 / (size(data,1) + 4.0))
+    s = (size(data, 2) * (size(data, 1) + 2) / 4.0)^(-1.0 / (size(data,1) + 4.0))
+    return 1 / (2 * s^2)
 end
 
 calculate_gamma(model, strategy::RuleOfThumbSilverman) = rule_of_thumb_silverman(model.data)
@@ -32,7 +33,8 @@ Scott, David W. Multivariate density estimation: theory, practice, and visualiza
 struct RuleOfThumbScott <: InitializationStrategyGamma end
 
 function rule_of_scott(data::Array{T,2}) where T <: Real
-    return size(data, 2)^(-1.0/(size(data, 1) + 4))
+    s = size(data, 2)^(-1.0/(size(data, 1) + 4))
+    return 1 / (2 * s^2)
 end
 
 calculate_gamma(model, strategy::RuleOfThumbScott) = rule_of_scott(model.data)
