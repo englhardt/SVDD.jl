@@ -46,7 +46,9 @@ The packages includes the following strategies to initialize parameters.
 * _Gauss Kernel gamma_
   * Rule of Scott [3]
   * Rule of Silverman [4]
-  * Wang data shifting [5]
+  * Mean criterion [5]
+  * Modified mean criterion [6]
+  * Wang data shifting [7]
   * Fixed Gamma
 * _Cost parameters C_
   * Rule of Tax [1]
@@ -67,15 +69,13 @@ This package is developed and maintained by [Holger Trittenbach](https://github.
 
 ## References
 
-[1] Tax, David MJ, and Robert PW Duin. "Support vector data description." Machine learning 54.1 (2004): 45-66.
-
-[2] Görnitz, Nico, et al. "Toward supervised anomaly detection." Journal of Artificial Intelligence Research 46 (2013): 235-262.
-
-[3] Scott, David W. Multivariate density estimation: theory, practice, and visualization. John Wiley & Sons, 2015.
-
-[4] Silverman, Bernard W. Density estimation for statistics and data analysis. Routledge, 2018.
-
-[5] Wang, Siqi, et al. "Hyperparameter selection of one-class support vector machine by self-adaptive data shifting." Pattern Recognition 74 (2018): 198-211.
+[1] Tax, David MJ, and Robert PW Duin. "Support vector data description." Machine learning 54.1 (2004): 45-66.<br>
+[2] Görnitz, Nico, et al. "Toward supervised anomaly detection." Journal of Artificial Intelligence Research 46 (2013): 235-262.<br>
+[3] Scott, David W. Multivariate density estimation: theory, practice, and visualization. John Wiley & Sons, 2015.<br>
+[4] Silverman, Bernard W. Density estimation for statistics and data analysis. Routledge, 2018.<br>
+[5] Chaudhuri, Arin, et al. "The mean and median criteria for kernel bandwidth selection for support vector data description." 2017 IEEE International Conference on Data Mining Workshops (ICDMW). IEEE, 2017.<br>
+[6] Liao, Yuwei, et al. "A new bandwidth selection criterion for using SVDD to analyze hyperspectral data." Algorithms and Technologies for Multispectral, Hyperspectral, and Ultraspectral Imagery XXIV. Vol. 10644. International Society for Optics and Photonics, 2018.<br>
+[7] Wang, Siqi, et al. "Hyperparameter selection of one-class support vector machine by self-adaptive data shifting." Pattern Recognition 74 (2018): 198-211.
 
 [docs-master-img]: https://img.shields.io/badge/docs-master-blue.svg
 [docs-master-url]: https://englhardt.github.io/SVDD.jl/latest

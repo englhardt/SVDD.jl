@@ -44,6 +44,47 @@ function calculate_gamma(model::SubSVDD, strategy::RuleOfThumbScott, subspace_id
 end
 
 """
+Original publication:
+Chaudhuri, A., Kakde, D., Sadek, C., Gonzalez, L. and Kong, S., 2017, November.
+The mean and median criteria for kernel bandwidth selection for support vector data description.
+In 2017 IEEE International Conference on Data Mining Workshops (ICDMW) (pp. 842-849). IEEE.
+"""
+DEFAULT_MEAN_CRIT_DELTA = sqrt(2)*10^-6
+
+struct MeanCriterion <: InitializationStrategyGamma
+    δ::Real
+    function MeanCriterion(δ::Real=DEFAULT_MEAN_CRIT_DELTA)
+        return new(δ)
+    end
+end
+
+function mean_criterion(data::Array{T,2}, δ::Real=DEFAULT_MEAN_CRIT_DELTA) where T <: Real
+    N = size(data, 2)
+    # Note that the (N-1) factor in the denominator original formula is already
+    # included in the var calculation
+    s = 2  * N * sum(var(data, dims=2)) / log((N - 1) / δ^2)
+    return 1 / (2 * s^2)
+end
+
+calculate_gamma(model, strategy::MeanCriterion) = mean_criterion(model.data, strategy.δ)
+
+"""
+Liao, Y., Kakde, D., Chaudhuri, A., Jiang, H., Sadek, C. and Kong, S., 2018, May.
+A new bandwidth selection criterion for using SVDD to analyze hyperspectral data.
+In Algorithms and Technologies for Multispectral, Hyperspectral, and Ultraspectral Imagery XXIV (Vol. 10644, p. 106441M). International Society for Optics and Photonics.
+"""
+struct ModifiedMeanCriterion <: InitializationStrategyGamma end
+
+function modified_mean_criterion(data::Array{T,2}, δ::Real=DEFAULT_MEAN_CRIT_DELTA) where T <: Real
+    N = size(data, 2)
+    ϕ = 1 / log(N - 1)
+    δ = -0.14818008 * ϕ^4 + 0.284623624 * ϕ^3 - 0.252853808 * ϕ^2 + 0.159059498 * ϕ - 0.001381145
+    return mean_criterion(data, δ)
+end
+
+calculate_gamma(model, strategy::ModifiedMeanCriterion) = modified_mean_criterion(model.data)
+
+"""
 Generate binary data to tune a one class classifier according to the following paper:
 Wang, S. et al. 2018. Hyperparameter selection of one-class support vector machine by self-adaptive data
 shifting. Pattern Recognition. 74, 2018.

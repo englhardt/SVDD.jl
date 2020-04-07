@@ -6,7 +6,8 @@
     pools = fill(:U, size(dummy_data, 2))
     model = SVDD.VanillaSVDD(dummy_data)
 
-    for s in [:RuleOfThumbSilverman, :RuleOfThumbScott]
+    for s in [:RuleOfThumbSilverman, :RuleOfThumbScott,
+              :MeanCriterion, :ModifiedMeanCriterion]
         @testset "$s" begin
             @test SVDD.calculate_gamma(model, SVDD.eval(s)()) > 0
         end
