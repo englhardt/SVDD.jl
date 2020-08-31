@@ -57,7 +57,7 @@ function set_eps!(model::SVDDnegEps, eps::Number)
     return nothing
 end
 
-function solve!(model::SVDDnegEps, solver::JuMP.OptimizerFactory)
+function solve!(model::SVDDnegEps, solver::SOLVER_TYPE)
     ULin = merge_pools(model.pools, :U, :Lin)
     length(ULin) > 0 || throw(ModelInvariantException("SVDDnegEps requires samples in pool :Lin or :U."))
 

@@ -5,7 +5,7 @@ using MLKernels, MLLabelUtils
 using Test
 using LinearAlgebra, Random, Statistics
 
-TEST_SOLVER =  with_optimizer(Ipopt.Optimizer, print_level=0)
+TEST_SOLVER =  optimizer_with_attributes(Ipopt.Optimizer, "print_level" => 0)
 
 include("test_utils.jl")
 
