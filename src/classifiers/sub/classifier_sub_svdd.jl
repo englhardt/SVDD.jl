@@ -73,7 +73,7 @@ function fit!(model::SubSVDD, solver)
     return status
 end
 
-function solve!(model::SubSVDD, solver::JuMP.OptimizerFactory)
+function solve!(model::SubSVDD, solver::SOLVER_TYPE)
     debug(LOGGER, "[SOLVE] Setting up QP for SubSVDD with $(is_K_adjusted(model) ? "adjusted" : "non-adjusted") kernel matrix.")
     QP = Model(solver)
     K = is_K_adjusted(model) ? model.K_adjusted : model.K

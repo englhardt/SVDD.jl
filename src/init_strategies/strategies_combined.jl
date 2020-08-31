@@ -50,7 +50,7 @@ end
     Determines C for WangGammaStrategy by using a provided C init strategy
 """
 struct WangCombinedInitializationStrategy <: InitializationStrategyCombined
-    solver::JuMP.OptimizerFactory
+    solver::SOLVER_TYPE
     gamma_search_range
     C_strategy::InitializationStrategyC
 end

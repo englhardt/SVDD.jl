@@ -107,7 +107,7 @@ function predict(model::SSAD, target::Array{T,2}) where T <: Real
     return model.ρ .- vec(mapslices(predict_observation, target, dims=1))
 end
 
-function fit!(model::SSAD, solver)
+function fit!(model::SSAD, solver::SOLVER_TYPE)
     debug(LOGGER, "[FIT] Fitting SSAD.")
     model.state == model_created && throw(ModelStateException(model.state, model_initialized))
 
@@ -132,7 +132,7 @@ function fit!(model::SSAD, solver)
 end
 
 # see also tilitools https://github.com/nicococo/tilitools/blob/master/tilitools/ssad_convex.py
-function solve!(model::SSAD, solver::JuMP.OptimizerFactory)
+function solve!(model::SSAD, solver::SOLVER_TYPE)
     debug(LOGGER, "[SOLVE] Setting up QP for SSAD with $(is_K_adjusted(model) ? "adjusted" : "non-adjusted") kernel matrix.")
     QP = Model(solver)
     K = is_K_adjusted(model) ? model.K_adjusted : model.K

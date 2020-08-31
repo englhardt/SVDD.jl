@@ -78,7 +78,7 @@
         SVDD.initialize!(model, init_strategy)
         SVDD.fit!(model, TEST_SOLVER)
         actual_outlier_percentage = countmap(SVDD.classify.(SVDD.predict(model, model.data)))[:outlier] / size(model.data, 2)
-        @test abs.(actual_outlier_percentage - target_outlier_percentage) < 0.04
+        @test abs.(actual_outlier_percentage - target_outlier_percentage) < 0.1
     end
 
     @testset "SimpleSubspaceStrategy" begin

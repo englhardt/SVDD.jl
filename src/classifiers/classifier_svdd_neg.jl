@@ -51,7 +51,7 @@ end
 
 set_C!(model::SVDDneg, C::Number) = set_C!(model, (C,C))
 
-function solve!(model::SVDDneg, solver::JuMP.OptimizerFactory)
+function solve!(model::SVDDneg, solver::SOLVER_TYPE)
     ULin = merge_pools(model.pools, :U, :Lin)
     length(ULin) > 0 || throw(ModelInvariantException("SVDDneg requires samples in pool :Lin or :U."))
 

@@ -8,6 +8,7 @@ import MLBase
 const learning_pool_enc = LabelEnc.NativeLabels([:U, :Lin, :Lout])
 const class_label_enc = LabelEnc.NativeLabels([:inlier, :outlier])
 const OPT_PRECISION = 1e-7
+const SOLVER_TYPE = JuMP.MOI.OptimizerWithAttributes
 
 @enum ModelState model_created=1 model_initialized=2 model_fitted=3
 
