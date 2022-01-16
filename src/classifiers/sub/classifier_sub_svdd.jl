@@ -13,7 +13,7 @@ mutable struct SubSVDD <: SubOCClassifier
     K::Array{Array{Float64,2}}
     adjust_K::Bool
     K_adjusted::Array{Array{Float64,2}}
-    pools::Dict{Symbol, Array{Int64,1}}
+    pools::Dict{Symbol, Array{Int,1}}
     v::Vector{Float64}
 
     # fitted values

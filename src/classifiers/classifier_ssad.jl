@@ -17,7 +17,7 @@ mutable struct SSAD <: OCClassifier
     K::Array{Float64,2}
     adjust_K::Bool
     K_adjusted::Array{Float64,2}
-    pools::Dict{Symbol, Array{Int64,1}}
+    pools::Dict{Symbol, Array{Int,1}}
 
     # fitted values
     alpha_values::Vector{Float64}
@@ -73,7 +73,7 @@ end
 
 function calculate_rho(model::SSAD)
     SV_candidates = findall(model.alpha_values .> OPT_PRECISION)
-    SV_candidates_U = haskey(model.pools, :U) ? SV_candidates ∩ model.pools[:U] : Int64[]
+    SV_candidates_U = haskey(model.pools, :U) ? SV_candidates ∩ model.pools[:U] : Int[]
     cy = get_cy(model)
 
     if length(SV_candidates_U) > 0
@@ -82,8 +82,8 @@ function calculate_rho(model::SSAD)
         ρ = isempty(sv) ? maximum(scores) : minimum(scores[sv])
     else
         scores = model.K'model.alpha_values
-        SV_candidates_Lin = haskey(model.pools, :Lin) ? SV_candidates ∩ model.pools[:Lin] : Int64[]
-        SV_candidates_Lout = haskey(model.pools, :Lout) ? SV_candidates ∩ model.pools[:Lout] : Int64[]
+        SV_candidates_Lin = haskey(model.pools, :Lin) ? SV_candidates ∩ model.pools[:Lin] : Int[]
+        SV_candidates_Lout = haskey(model.pools, :Lout) ? SV_candidates ∩ model.pools[:Lout] : Int[]
         if length(SV_candidates_Lout) > 0 && length(SV_candidates_Lin) == 0
             warn(LOGGER, "[CALCULATE_RHO] There are no labeled inlier SV -- check OPT_PRECISION.")
             ρ = maximum(scores[SV_candidates_Lout])

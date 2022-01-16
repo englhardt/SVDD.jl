@@ -13,7 +13,7 @@ mutable struct SVDDnegEps <: SVDDClassifier
     K::Array{Float64,2}
     adjust_K::Bool
     K_adjusted::Array{Float64,2}
-    pools::Dict{Symbol, Array{Int64,1}}
+    pools::Dict{Symbol, Array{Int,1}}
 
     # fitted values
     alpha_values::Vector{Float64}
