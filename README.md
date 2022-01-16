@@ -2,8 +2,8 @@
 _A Julia package for Support Vector Data Description._
 
 [![][docs-master-img]][docs-master-url]
-[![Build Status](https://travis-ci.com/englhardt/SVDD.jl.svg?branch=master)](https://travis-ci.com/englhardt/SVDD.jl)
-[![Coverage Status](https://coveralls.io/repos/github/englhardt/SVDD.jl/badge.svg?branch=master)](https://coveralls.io/github/englhardt/SVDD.jl?branch=master)
+[![Actions Status: test](https://github.com/englhardt/SVDD.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/englhardt/SVDD.jl/actions)
+[![codecov](https://codecov.io/gh/englhardt/SVDD.jl/branch/master/graph/badge.svg?token=QH8JQREEIH)](https://codecov.io/gh/englhardt/SVDD.jl)
 
 This package implements one-class classifiers and based on support vector data description.
 The package has been developed as part of a benchmark suite for [active-learning](https://en.wikipedia.org/wiki/Active_learning_(machine_learning)) strategies for one-class classification. For more information about this research project, see the [OCAL project](https://www.ipd.kit.edu/ocal/) website, and the companion paper.
@@ -11,7 +11,7 @@ The package has been developed as part of a benchmark suite for [active-learning
 > Holger Trittenbach, Adrian Englhardt, Klemens Böhm, "An overview and a benchmark of active learning for outlier detection with one-class classifiers", DOI: [10.1016/j.eswa.2020.114372](https://doi.org/10.1016/j.eswa.2020.114372), Expert Systems with Applications, 2021.
 
 ## Installation
-This package works with Julia 1.0 or newer (latest tested version is 1.5).
+This package works with Julia 1.0 or newer.
 This package is not registered yet. Please use the following command to add the package with Pkg3.
 ```Julia
 using Pkg
