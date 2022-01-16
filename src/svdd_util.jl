@@ -1,7 +1,7 @@
 
 function merge_pools(pools, names...)
     (names[1] == [] || MLLabelUtils.islabelenc(collect(names), SVDD.learning_pool_enc)) || throw(ArgumentError("$(collect(names)) is not a valid label encoding."))
-    return reduce((r, key) -> vcat(r, haskey(pools, key) ? pools[key] : Int64[]), unique(names); init=Int64[])
+    return reduce((r, key) -> vcat(r, haskey(pools, key) ? pools[key] : Int[]), unique(names); init=Int[])
 end
 
 classify(x::Number; opt_precision = OPT_PRECISION) = x > opt_precision ? :outlier : :inlier
