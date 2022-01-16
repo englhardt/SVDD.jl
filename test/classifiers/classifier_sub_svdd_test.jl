@@ -75,7 +75,7 @@
         predictions = @eachsubspace SVDD.predict(model)
         @test length(predictions) == 2
         @test all(length.(predictions) .== size(model.data, 2))
-        @test all(map(x -> all(x .< 1e-5), predictions))
+        @test all(map(x -> all(x .< 1e-3), predictions))
     end
 
     @testset "update_with_feedback" begin

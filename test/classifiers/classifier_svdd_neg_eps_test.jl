@@ -39,7 +39,7 @@
 
         actual = SVDD.predict(svdd_neg, dummy_data)
 
-        @test expected ≈ actual
+        @test expected ≈ actual rtol=1e-5
         @test sum(actual .> 0) == sum(labels .== :outlier)
     end
 
@@ -93,7 +93,7 @@
         SVDD.fit!(svdd_neg, TEST_SOLVER)
         actual = SVDD.predict(svdd_neg, dummy_data)
         @test expected ≈ actual
-        @test svdd_neg.alpha_values ≈ SVDD.get_alpha_prime(svdd_neg)
+        @test svdd_neg.alpha_values ≈ SVDD.get_alpha_prime(svdd_neg) rtol=1e-5
     end
 
     @testset "params" begin
